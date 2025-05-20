@@ -9,4 +9,14 @@ public class HelloController {
     public String index() {
         return "Hello World from Tin Dao";
     }
+
+    @GetMapping("/user")
+    public String userPage() {
+        return "only user";
+    }
+
+    @GetMapping("/admin")
+    public String adminPage() {
+        return "only admin";
+    }
 }

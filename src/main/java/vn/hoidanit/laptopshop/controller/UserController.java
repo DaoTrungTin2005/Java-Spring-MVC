@@ -2,6 +2,7 @@ package vn.hoidanit.laptopshop.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,10 +22,12 @@ public class UserController {
     }
 
     @RequestMapping("/")
-    public String getHomePage() {
-        String test = this.userService.handleHello();
-        return "hello";
-    }
+    public String getHomePage(Model model) {
+        String test = this.userService.handleHello(); //controller gọi từ model (service) để tính toán hàm, dữ liệu
+        model.addAttribute("eric", test); // model sau khi có data rồi nó sẽ gửi lại thằng controller
+        model.addAttribute("tindao", "from controller with model");
+        return "hello"; // controller xử lí data và gửi lại cho view
+    } // view render ra html
 }
 
 // @RestController

@@ -49,6 +49,9 @@ public class UserController {
 
     @RequestMapping("/admin/user") // get
     public String getUserPage(Model model) {
+        List<User> users = this.userService.getAllUser();
+        System.out.println("check users : " + users);
+        model.addAttribute("users1", users);
         return "admin/user/table-user";
     }
 
@@ -63,7 +66,7 @@ public class UserController {
         System.out.println("run here" + Daotrungtin);
         // lưu vào database lun
         this.userService.handleSaveUser(Daotrungtin);
-        return "hello";
+        return "redirect:/admin/user";
     }
 }
 

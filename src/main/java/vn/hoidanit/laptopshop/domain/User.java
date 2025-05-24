@@ -12,12 +12,14 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-
     private String email;
     private String password;
     private String fullname;
     private String address;
     private String phone;
+    private String avatar;
+
+    // roleId
 
     public void setId(long id) {
         this.id = id;
@@ -41,6 +43,10 @@ public class User {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
     }
 
     public long getId() {
@@ -67,10 +73,17 @@ public class User {
         return phone;
     }
 
+    public String getAvatar() {
+        return avatar;
+    }
+
     @Override
     public String toString() {
         return "User [id=" + id + ", email=" + email + ", password=" + password + ", fullname=" + fullname
-                + ", address=" + address + ", phone=" + phone + "]";
+                + ", address=" + address + ", phone=" + phone + ", avatar=" + avatar + "]";
     }
+
+
+
 
 }

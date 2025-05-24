@@ -59,22 +59,25 @@ public class UserController {
 
     @RequestMapping("/admin/user/{id}")
     public String getUserDetailPage(Model model, @PathVariable long id) {
+        // truy cập cơ sở dữ liệu và trả về đối tượng User có id tương ứng.
         User user = this.userService.getUserById(id);
         System.out.println("=======================");
         System.out.println("check path id = " + id);
         System.out.println("=======================");
         model.addAttribute("user", user);
-        model.addAttribute("id", id); // truyền từ controller qua view
+        // model.addAttribute("id", id); // truyền từ controller qua view
         return "admin/user/show";
     }
 
     @RequestMapping("/admin/user/create") // get
     public String getCreateUserPage(Model model) {
         // lúc tạo mỡi chưa có người dùng thì truyền dô rỗng
+        //Bạn truyền 1 đối tượng User rỗng vào model, đặt tên là "newUser", để form trong JSP có thể binding dữ liệu vào đó.
         model.addAttribute("newUser", new User());
         return "admin/user/create";
     }
 
+    // cái nào có phương thức post mới xử lí
     @RequestMapping(value = "/admin/user/create", method = RequestMethod.POST)
     // lấy data từ view
     public String createUserPage(Model model, @ModelAttribute("newUser") User Daotrungtin) {

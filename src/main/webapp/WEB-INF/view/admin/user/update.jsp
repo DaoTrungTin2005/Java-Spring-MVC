@@ -26,21 +26,21 @@
                 >
                     <div class="mb-3" style="display: none;">
                         <label  class="form-label">Id: </label>
-                        <form:input type="text" class="form-control" 
-                        path="id"  
+                        <form:input type="text" class="form-control"
+                        path="id"
                         />
                     </div>
 
                     <div class="mb-3">
                         <label  class="form-label">Email: </label>
                         <form:input type="email" class="form-control" disabled="true"
-                        path="email" 
+                        path="email"
                         />
                     </div>
                     <div class="mb-3">
                         <label  class="form-label">Password</label>
-                        <form:input type="password" class="form-control" 
-                        path="password" 
+                        <form:input type="password" class="form-control"
+                        path="password"
                         />
                     </div>
                     <div class="mb-3">

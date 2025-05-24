@@ -20,7 +20,7 @@
         <div class="row">
             <div class="col-12 mx-auto">
                 <div class="d-flex justify-content-between">
-                    <h3>User Details with id = ${id}</h3>
+                    <h3>User Details with id = ${user.id}</h3>
               
                 </div>
 

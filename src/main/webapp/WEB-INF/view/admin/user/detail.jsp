@@ -29,26 +29,28 @@
                         <li class="breadcrumb-item active"><a href="/admin">Dashboard</a></li>
                         <li class="breadcrumb-item active">Users</li>
                     </ol>
-                        <div class="container mt-5">
+<div class="container mt-5">
         <div class="row">
-            <div class="col-md-5 col-12 mx-auto">
-                <div class="d-flex justify-content-between"></div>
-                <h3>Delete user with id = ${id}</h3>
-            </div>
+            <div class="col-12 mx-auto">
+                <div class="d-flex justify-content-between">
+                    <h3>User Details with id = ${user.id}</h3>
+              
+                </div>
 
-            <hr >
-            <div class="alert alert-danger"> Are you sure to delete this user ?</div>
-            <form:form method = "post" action="/admin/user/delete" modelAttribute="newUser"  >
-                    <div class="mb-3" style="display: none;">
-                        <label  class="form-label">Id: </label>
-                        <form:input value="${id}" type="text" class="form-control" 
-                        path="id"  
-                        />
-                    </div>
-                <button class="btn btn-danger">Confirm</button>
-            </form:form>
-        </div>
-    </div>
+                <hr />
+                <div class="card" style="width: 60%"> 
+                <div class="card-header"> 
+                User information
+                </div> 
+                    <ul class="list-group list-group-flush"> 
+                        <li class="list-group-item">ID : ${user.id}</li> 
+                        <li class="list-group-item">Email : ${user.email} </li> 
+                        <li class="list-group-item">FullName : ${user.fullname}</li> 
+                        <li class="list-group-item">Address : ${user.address} </li>
+                    </ul> 
+                </div> 
+
+                <a href="/admin/user" class="btn btn-success mt-3" >Back</a>
                 </div>
             </main>
             <jsp:include page="../layout/footer.jsp" />

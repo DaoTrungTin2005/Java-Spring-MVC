@@ -1,4 +1,5 @@
 
+
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
@@ -24,31 +25,12 @@
         <div id="layoutSidenav_content">
             <main>
                 <div class="container-fluid px-4">
-                    <h1 class="mt-4">Manage Users</h1>
+                    <h1 class="mt-4">Dashboard</h1>
                     <ol class="breadcrumb mb-4">
                         <li class="breadcrumb-item active"><a href="/admin">Dashboard</a></li>
-                        <li class="breadcrumb-item active">Users</li>
+                        <li class="breadcrumb-item active">Products</li>
                     </ol>
-                        <div class="container mt-5">
-        <div class="row">
-            <div class="col-md-5 col-12 mx-auto">
-                <div class="d-flex justify-content-between"></div>
-                <h3>Delete user with id = ${id}</h3>
-            </div>
-
-            <hr >
-            <div class="alert alert-danger"> Are you sure to delete this user ?</div>
-            <form:form method = "post" action="/admin/user/delete" modelAttribute="newUser"  >
-                    <div class="mb-3" style="display: none;">
-                        <label  class="form-label">Id: </label>
-                        <form:input value="${id}" type="text" class="form-control" 
-                        path="id"  
-                        />
-                    </div>
-                <button class="btn btn-danger">Confirm</button>
-            </form:form>
-        </div>
-    </div>
+                            <div>Table Product</div>
                 </div>
             </main>
             <jsp:include page="../layout/footer.jsp" />

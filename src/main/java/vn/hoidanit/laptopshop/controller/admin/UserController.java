@@ -1,5 +1,9 @@
-package vn.hoidanit.laptopshop.controller;
+package vn.hoidanit.laptopshop.controller.admin;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +17,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
+import jakarta.servlet.ServletContext;
 import vn.hoidanit.laptopshop.domain.User;
 import vn.hoidanit.laptopshop.repository.UserRepository;
 import vn.hoidanit.laptopshop.service.UserService;
@@ -24,9 +31,11 @@ public class UserController {
 
     // DI : Dependency injection
     private final UserService userService;
+    private final ServletContext servletContext;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, ServletContext servletContext) {
         this.userService = userService;
+        this.servletContext = servletContext;
 
     }
 
@@ -54,7 +63,7 @@ public class UserController {
         List<User> users = this.userService.getAllUser();
         System.out.println("check users : " + users);
         model.addAttribute("users1", users);
-        return "admin/user/table-user";
+        return "admin/user/show";
     }
 
     @RequestMapping("/admin/user/{id}")
@@ -66,24 +75,48 @@ public class UserController {
         System.out.println("=======================");
         model.addAttribute("user", user);
         // model.addAttribute("id", id); // truyền từ controller qua view
-        return "admin/user/show";
+        return "admin/user/detail";
     }
 
-    @RequestMapping("/admin/user/create") // get
+    @GetMapping("/admin/user/create") // get
     public String getCreateUserPage(Model model) {
         // lúc tạo mỡi chưa có người dùng thì truyền dô rỗng
-        //Bạn truyền 1 đối tượng User rỗng vào model, đặt tên là "newUser", để form trong JSP có thể binding dữ liệu vào đó.
+        // Bạn truyền 1 đối tượng User rỗng vào model, đặt tên là "newUser", để form
+        // trong JSP có thể binding dữ liệu vào đó.
         model.addAttribute("newUser", new User());
         return "admin/user/create";
     }
 
     // cái nào có phương thức post mới xử lí
-    @RequestMapping(value = "/admin/user/create", method = RequestMethod.POST)
+    @PostMapping(value = "/admin/user/create")
     // lấy data từ view
-    public String createUserPage(Model model, @ModelAttribute("newUser") User Daotrungtin) {
-        System.out.println("run here" + Daotrungtin);
-        // lưu vào database lun
-        this.userService.handleSaveUser(Daotrungtin);
+    public String createUserPage(Model model, @ModelAttribute("newUser") User Daotrungtin,
+            @RequestParam("hoidanitFile") MultipartFile file) {
+        try {
+            byte[] bytes;
+
+            bytes = file.getBytes();
+
+            String rootPath = this.servletContext.getRealPath("/resources/images");
+            File dir = new File(rootPath + File.separator + "avatar");
+            if (!dir.exists())
+                dir.mkdirs();
+
+            // Create the file on server (lưu file)
+            File serverFile = new File(dir.getAbsolutePath() + File.separator +
+                    +System.currentTimeMillis() + "-" + file.getOriginalFilename());
+
+            BufferedOutputStream stream = new BufferedOutputStream(
+                    new FileOutputStream(serverFile));
+            stream.write(bytes);
+            stream.close();
+
+            // lưu vào database lun
+            // this.userService.handleSaveUser(Daotrungtin);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         return "redirect:/admin/user";
     }
 

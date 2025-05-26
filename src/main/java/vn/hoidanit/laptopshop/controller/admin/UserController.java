@@ -7,7 +7,8 @@ import java.io.IOException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import jakarta.servlet.ServletContext;
 import vn.hoidanit.laptopshop.domain.User;
 import vn.hoidanit.laptopshop.repository.UserRepository;
+import vn.hoidanit.laptopshop.service.UploadService;
 import vn.hoidanit.laptopshop.service.UserService;
 
 import org.springframework.web.bind.annotation.RequestParam;
@@ -31,11 +33,14 @@ public class UserController {
 
     // DI : Dependency injection
     private final UserService userService;
-    private final ServletContext servletContext;
+    private final UploadService uploadService;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserController(UserService userService, ServletContext servletContext) {
+    public UserController(UserService userService, UploadService uploadService,
+            PasswordEncoder passwordEncoder) {
         this.userService = userService;
-        this.servletContext = servletContext;
+        this.uploadService = uploadService;
+        this.passwordEncoder = passwordEncoder;
 
     }
 
@@ -92,31 +97,15 @@ public class UserController {
     // lấy data từ view
     public String createUserPage(Model model, @ModelAttribute("newUser") User Daotrungtin,
             @RequestParam("hoidanitFile") MultipartFile file) {
-        try {
-            byte[] bytes;
 
-            bytes = file.getBytes();
+        String avatar = this.uploadService.handleSaveUploadFile(file, "avatar");
+        String hashPassword = this.passwordEncoder.encode(Daotrungtin.getPassword());
 
-            String rootPath = this.servletContext.getRealPath("/resources/images");
-            File dir = new File(rootPath + File.separator + "avatar");
-            if (!dir.exists())
-                dir.mkdirs();
+        Daotrungtin.setAvatar(avatar);
+        Daotrungtin.setPassword(hashPassword);
+        Daotrungtin.setRole(this.userService.getRoleByName(Daotrungtin.getRole().getName()));
 
-            // Create the file on server (lưu file)
-            File serverFile = new File(dir.getAbsolutePath() + File.separator +
-                    +System.currentTimeMillis() + "-" + file.getOriginalFilename());
-
-            BufferedOutputStream stream = new BufferedOutputStream(
-                    new FileOutputStream(serverFile));
-            stream.write(bytes);
-            stream.close();
-
-            // lưu vào database lun
-            // this.userService.handleSaveUser(Daotrungtin);
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        this.userService.handleSaveUser(Daotrungtin);
         return "redirect:/admin/user";
     }
 

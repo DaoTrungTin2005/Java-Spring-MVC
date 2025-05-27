@@ -20,6 +20,10 @@ public class UploadService {
     }
 
     public String handleSaveUploadFile(MultipartFile file, String targetFolder) {
+        // don't upload file
+        if (file.isEmpty())
+            return "";
+
 
         // relative path : absolute path
         // đường link trỏ tới thư mục web app (cộng thêm /resources/images đẻ trỏ đúng

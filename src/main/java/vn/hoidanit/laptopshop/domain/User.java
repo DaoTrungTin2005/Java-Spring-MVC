@@ -12,6 +12,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
@@ -23,15 +24,15 @@ public class User {
     private long id;
 
     @NotNull
-    @Email
+    @Email(message = "Email khong duoc bo trong", regexp = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$")
     private String email;
 
     @NotNull
-    @Min(2)
+    @Size(min = 2, message = "Do dai pass it nhat 2 ki tu")
     private String password;
 
     @NotNull
-    @Min(2)
+    @Size(min = 3, message = "Do dai pass it nhat 3 ki tu")
     private String fullname;
 
     private String address;

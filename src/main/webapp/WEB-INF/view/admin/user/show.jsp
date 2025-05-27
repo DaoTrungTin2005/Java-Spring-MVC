@@ -45,6 +45,7 @@
                         <th>Email</th>
                         <th>Full Name</th>
                         <th>Action</th>
+                        <th>role</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -54,6 +55,7 @@
                             <th>${user.id}</th>
                             <td>${user.email}</td>
                             <td>${user.fullname}</td>
+                            
                             <td>
                                 
                                 <a href="/admin/user/${user.id}" class="btn btn-success">View</a>
@@ -61,6 +63,8 @@
                                 <a href="/admin/user/update/${user.id}" class="btn btn-warning mx-2">Update</a>
                                 <a href="/admin/user/delete/${user.id}" class="btn btn-danger">Delete</a>
                             </td>
+
+                            <td>${user.role.name}</td>
                         </tr>
                     </c:forEach>
 

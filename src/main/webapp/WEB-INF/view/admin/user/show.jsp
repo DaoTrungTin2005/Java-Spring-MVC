@@ -41,11 +41,11 @@
                 <table class="table table-bordered table-hover">
                 <thead>
                     <tr>
-                        <th>ID</th>
+                       <th>ID</th>
                         <th>Email</th>
                         <th>Full Name</th>
                         <th>Action</th>
-                        <th>role</th>
+                        <th>role</th> 
                     </tr>
                 </thead>
                 <tbody>

@@ -112,7 +112,7 @@ $("#avatarPreview").css({ "display": "block" });
 
                     <div class="mb-3 col-12 col-md-6">
                         <label for="avatarFile" class="form-label" >Avatar:</label>
-                        <input class="form-control" type="file" id="avatarFile" accept=".png, .jpg, .jpeg" 
+                        <input class="form-control" type="file" id="avatarFile" accept=".pn 'is-invalid' : g, .jpg, .jpeg" 
                         name="hoidanitFile"
                         />
                     </div>

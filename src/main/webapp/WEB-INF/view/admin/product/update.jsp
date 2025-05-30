@@ -23,8 +23,24 @@ avatarFile.change(function (e) {
 const imgURL = URL.createObjectURL(e.target.files[0]); 
 $("#avatarPreview").attr("src", imgURL); 
 $("#avatarPreview").css({ "display": "block" }); 
+
+avatarFile.change (function (e) { 
+const imgURL = URL.createObjectURL(e.target.files[0]); 
+$("#avatarPreview").attr("src", imgURL); 
+$("#avatarPreview").css({ "display": "block" }); 
+}); 
+
 }); 
 }); 
+
+
+
+
+
+
+
+
+
 </script>
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
 </head>
@@ -148,7 +164,7 @@ $("#avatarPreview").css({ "display": "block" });
 
 
                     <div class="col-12 mb-5">
-                    <button type="submit" class="btn btn-primary">Create</button>
+                    <button type="submit" class="btn btn-primary">Update</button>
                     </div>
                 </form:form>
             </div>

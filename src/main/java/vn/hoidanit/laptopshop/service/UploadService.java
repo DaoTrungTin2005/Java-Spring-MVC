@@ -24,7 +24,6 @@ public class UploadService {
         if (file.isEmpty())
             return "";
 
-
         // relative path : absolute path
         // đường link trỏ tới thư mục web app (cộng thêm /resources/images đẻ trỏ đúng
         // đường link thực tế)
@@ -38,7 +37,7 @@ public class UploadService {
 
             bytes = file.getBytes();
             // cộng chuỗi trỏ tới thư mục avatar
-            File dir = new File(rootPath + File.separator + "avatar");
+            File dir = new File(rootPath + File.separator + targetFolder);
 
             // nếu thư mục chưa tồn tại -> tạo mới nó
             if (!dir.exists())

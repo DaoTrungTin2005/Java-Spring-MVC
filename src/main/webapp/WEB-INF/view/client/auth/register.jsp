@@ -28,8 +28,13 @@
                                         <form:form method="post" action="/register" 
                                         modelAttribute="registerUser"
                                         >
-                        <c:set var="errorPassword"> 
+                                        <!-- so sánh pass và confirm -->
+                        <c:set var="errorPasswordANDConfirm"> 
                             <form:errors path="confirmPassword" Class="invalid-feedback" /> 
+                        </c:set>
+
+                        <c:set var="errorPassword"> 
+                            <form:errors path="password" Class="invalid-feedback" /> 
                         </c:set>
                         <c:set var="errorEmail"> 
                             <form:errors path="email"  Class="invalid-feedback"/> 
@@ -73,12 +78,15 @@
                                                 <div class="col-md-6">
                                                     <div class="form-floating mb-3 mb-md-0">
                                                         <form:input 
-                                                         class="form-control ${not empty errorPassword ? 'is-invalid' : ''}" 
+                                                         class="form-control
+                                                         ${not empty errorPassword ? 'is-invalid' : ''}"
+                                  
                                                         type="password" placeholder="Create a password" 
                                                         path="password"/>
                                                         <label>Password</label>
                                                         <!-- // truyền vào thuộc tính mún  báo lỗi -->
                                                          <!-- DO ở phần RegisterValidator mình khai báo trường Confirm password -->
+                                                        
                                                         ${errorPassword}
                                                     </div>
                                                 </div>
@@ -86,15 +94,18 @@
 
                                                 <div class="col-md-6">
                                                     <div class="form-floating mb-3 mb-md-0">
-                                                        <form:input class="form-control" id="inputPasswordConfirm" type="password" placeholder="Confirm password" 
+                                                        <form:input 
+                                                        class="form-control ${not empty errorPasswordANDConfirm ? 'is-invalid' : ''}" 
+                                                        
+                                                         type="password" placeholder="Confirm password" 
                                                         path="confirmPassword"/>
                                                         <label for="inputPasswordConfirm">Confirm Password</label>
-
+                                                            ${errorPasswordANDConfirm}
                                                     </div>
                                                 </div>
                                             </div>
 
-                                            
+
                                             <div class="mt-4 mb-0">
                                                 <div class="d-grid"><button class="btn btn-primary btn-block"> 
                                                     Create Account

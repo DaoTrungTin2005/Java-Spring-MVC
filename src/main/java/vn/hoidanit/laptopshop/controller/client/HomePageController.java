@@ -62,7 +62,7 @@ public class HomePageController {
 
         // phải render qua view nè
         if (bindingResult.hasErrors())
-            return  "client/auth/register" ; 
+            return  "client/auth/register" ;
 
 
         // cái hàm registerDTOtoUser đã convert rùi

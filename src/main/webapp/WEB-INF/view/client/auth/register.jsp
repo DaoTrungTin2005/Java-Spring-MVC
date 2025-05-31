@@ -32,7 +32,7 @@
                             <form:errors path="confirmPassword" Class="invalid-feedback" /> 
                         </c:set>
                         <c:set var="errorEmail"> 
-                            <form:errors path="email" cssClass="invalid-feedback" /> 
+                            <form:errors path="email"  Class="invalid-feedback"/> 
                         </c:set> 
                                             <div class="row mb-3">
                                                 <div class="col-md-6">
@@ -90,7 +90,7 @@
                                         </form:form>
                                     </div>
                                     <div class="card-footer text-center py-3">
-                                        <div class="small"><a href="login.html">Have an account? Go to login</a></div>
+                                        <div class="small"><a href="/login">Have an account? Go to login</a></div>
                                     </div>
                                 </div>
                             </div>

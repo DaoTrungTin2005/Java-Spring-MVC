@@ -52,13 +52,19 @@ public class UserService {
     }
 
     // Mapper
-    public User registerDTOtoUser(RegisterDTO registerDTO){
-                User user = new User() ;
+    public User registerDTOtoUser(RegisterDTO registerDTO) {
+        User user = new User();
 
-                user.setFullname(registerDTO.getFirstName() + " " + registerDTO.getLastName());
-                user.setEmail(registerDTO.getEmail());
-                user.setPassword(registerDTO.getPassword());
-                // sao ko làm cho confirm password nhỉ
-                return user ; 
+        user.setFullname(registerDTO.getFirstName() + " " + registerDTO.getLastName());
+        user.setEmail(registerDTO.getEmail());
+        user.setPassword(registerDTO.getPassword());
+        // sao ko làm cho confirm password nhỉ
+        return user;
+    }
+
+    // coi email coi tồn tại chưa
+    public boolean checkEmailExist(String email) {
+
+        return this.userRepository.existsByEmail(email);
     }
 }

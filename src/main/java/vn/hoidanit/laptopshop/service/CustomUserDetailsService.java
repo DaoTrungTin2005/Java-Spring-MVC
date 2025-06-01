@@ -10,6 +10,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 
+
+// Lấy thông tin người dùng từ database khi người dùng đăng nhập.
+
+
 @Service
 public class CustomUserDetailsService implements UserDetailsService{
 

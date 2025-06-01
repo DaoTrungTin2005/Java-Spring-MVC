@@ -10,7 +10,9 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 
+import jakarta.servlet.DispatcherType;
 import vn.hoidanit.laptopshop.service.CustomUserDetailsService;
 import vn.hoidanit.laptopshop.service.UserService;
 
@@ -43,6 +45,8 @@ public class SecurityConfiguration {
     // return authenticationManagerBuilder.build();
     // }
 
+    // Dùng userDetailsService để tìm user trong DB.
+    // Dùng passwordEncoder để so sánh mật khẩu.
     @Bean
     public DaoAuthenticationProvider authProvider(
             PasswordEncoder passwordEncoder,
@@ -52,6 +56,32 @@ public class SecurityConfiguration {
         authProvider.setPasswordEncoder(passwordEncoder);
         // authProvider.setHideUserNotFoundExceptions(false);
         return authProvider;
+    }
+
+    // dòng code này trang login của bản thân sẽ hiện ra thay cho trang login của
+    // spring security
+    // sẽ có lỗi redirect too many
+    // gắn thêm máy dòng thì dô lại dc
+    // thêm "/" để khi dô trang chủ nó ko đá mình về login  (tragn chủ ko cần đăng nhập nữa)
+    @Bean
+    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.authorizeHttpRequests(authorize -> authorize
+        // DispatcherType.FORWARD cho phép truy cập tới view
+        // DispatcherType.INCLUDE  ko có cái này dô trang chủ nó ko load dc
+                .dispatcherTypeMatchers(DispatcherType.FORWARD,
+                        DispatcherType.INCLUDE)
+                .permitAll()
+                .requestMatchers("/","/login", "/client/**", "/css/**", "/js/**",
+                        "/images/**")
+                .permitAll()
+                .anyRequest().authenticated())
+
+                .formLogin(formLogin -> formLogin
+                        .loginPage("/login")
+                        // khi login failed nó dẫn tới link này
+                        .failureUrl("/login?error")
+                        .permitAll());
+        return http.build();
     }
 
 }

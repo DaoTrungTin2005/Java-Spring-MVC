@@ -31,9 +31,9 @@ public class CustomUserDetailsService implements UserDetailsService{
             }
 // đa hinh : thằng User nó kế thừa UserDetail nên ko cần trả lại kiểu thằng cha mà trả kiểu thằng con là đươc
 // thằng java tự ddộng ép kiểu
-           return new User( 
-                user.getEmail(), 
-                user.getPassword(), 
+           return new User(
+                user.getEmail(),
+                user.getPassword(),
                 Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))); 
                 }
     }

@@ -51,19 +51,18 @@ public class HomePageController {
 
     @PostMapping("/register")
     public String handleRegister(@ModelAttribute("registerUser") @Valid RegisterDTO registerDTO,
-    BindingResult  bindingResult
-    ) {
+            BindingResult bindingResult) {
 
         // cái này chỉ là thông báo lỗi ra màn hình thôi
         // List<FieldError> errors = bindingResult.getFieldErrors();
         // for (FieldError error : errors) {
-        //     System.out.println(">>>>" + error.getField() + " - " + error.getDefaultMessage());
+        // System.out.println(">>>>" + error.getField() + " - " +
+        // error.getDefaultMessage());
         // }
 
         // phải render qua view nè
         if (bindingResult.hasErrors())
-            return  "client/auth/register" ;
-
+            return "client/auth/register";
 
         // cái hàm registerDTOtoUser đã convert rùi
         User user = this.userService.registerDTOtoUser(registerDTO);
@@ -72,17 +71,23 @@ public class HomePageController {
 
         user.setPassword(hashPassword);
         // role thì truyền cứng vào USER luôn
-        user.setRole(this.userService.getRoleByName("USER") );
+        user.setRole(this.userService.getRoleByName("USER"));
 
         this.userService.handleSaveUser(user);
-        return "redirect:/login" ;
-      
+        return "redirect:/login";
+
     }
 
     @GetMapping("/login")
     public String getLoginPage(Model model) {
 
         return "client/auth/login";
+    }
+
+    @GetMapping("/access-deny")
+    public String getDenyPage(Model model) {
+
+        return "client/auth/deny";
     }
 
 }

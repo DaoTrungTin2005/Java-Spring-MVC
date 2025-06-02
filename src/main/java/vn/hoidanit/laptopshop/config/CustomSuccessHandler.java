@@ -16,9 +16,17 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-
+ // người dùng bình thường về trang hơm , người dùng admin về trang admin
 public class CustomSuccessHandler implements AuthenticationSuccessHandler {
     protected String determineTargetUrl(final Authentication authentication) {
+
+
+
+//         Nếu user có ROLE_USER, chuyển về /.
+
+// Nếu user có ROLE_ADMIN, chuyển về /admin.
+
+// ➡️ Đây là logic điều hướng (redirect) sau khi đăng nhập, KHÔNG liên quan đến việc bảo vệ route.
 
         Map<String, String> roleTargetUrlMap = new HashMap<>();
         roleTargetUrlMap.put("ROLE_USER", "/");
@@ -45,7 +53,7 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
 
     private RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
 
-    // người dùng bình thường về trang hơm , người dùng admin về trang admin
+   
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
             Authentication authentication) throws IOException, ServletException {

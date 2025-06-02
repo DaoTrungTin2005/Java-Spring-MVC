@@ -88,6 +88,16 @@ public class SecurityConfiguration {
                 .permitAll()
 
                 // giao diện admin chỉ có admin mới dc dô
+
+//        Đây là phần cấu hình bảo mật: chặn người không có quyền truy cập trang admin.
+
+// Nếu user cố tình truy cập /admin, Spring sẽ kiểm tra role.
+
+// Nếu không có ROLE_ADMIN → 403 Forbidden.
+
+// ➡️ Đây là logic phân quyền, để ngăn chặn truy cập trái phép.
+
+
                 .requestMatchers("/admin/**").hasRole("ADMIN")
 
                 .anyRequest().authenticated())
@@ -96,8 +106,16 @@ public class SecurityConfiguration {
                         .loginPage("/login")
                         // khi login failed nó dẫn tới link này
                         .failureUrl("/login?error")
+
+                        // truyền vô cái hàm 
                         .successHandler(customSuccessHandler())
-                        .permitAll());
+                        .permitAll())
+                        // user mà đăng nhập dô trang admin thì sẽ dô cái đường link /access-deny
+
+                        // định nghía /access-deny ở homepageController
+
+                        .exceptionHandling(ex -> ex.accessDeniedPage("/access-deny"));
+
         return http.build();
     }
 

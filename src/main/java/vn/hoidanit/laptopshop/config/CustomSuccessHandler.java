@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.DefaultRedirectStrategy;
@@ -16,9 +17,15 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import vn.hoidanit.laptopshop.domain.User;
 // người dùng bình thường về trang hơm , người dùng admin về trang admin
+import vn.hoidanit.laptopshop.service.UserService;
 
 public class CustomSuccessHandler implements AuthenticationSuccessHandler {
+    @Autowired
+    private UserService userService;
+
+
     // Phương thức này sẽ được gọi khi người dùng đăng nhập thành công
     // và sẽ xác định URL đích dựa trên quyền của người dùng đã đăng nhập.
     protected String determineTargetUrl(final Authentication authentication) {
@@ -59,7 +66,7 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
     // Phương thức này sẽ được gọi khi người dùng đăng nhập thành công
     // và sẽ dọn dẹp các thuộc tính xác thực trong session để tránh việc lặp lại
     // thông tin xác thực.
-    protected void clearAuthenticationAttributes(HttpServletRequest request) {
+    protected void clearAuthenticationAttributes(HttpServletRequest request, Authentication authentication) {
         // truyền vào false ám chỉ chỉ khi nào có session thì mới lấy ra, nếu không có
         // thì trả về null
         // nếu không có session thì không cần làm gì cả
@@ -72,13 +79,26 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
         // xóa thuộc tính AUTHENTICATION_EXCEPTION khỏi session
         // thuộc tính này được sử dụng để lưu trữ thông tin về lỗi xác thực nếu có
         session.removeAttribute(WebAttributes.AUTHENTICATION_EXCEPTION);
+
+
+        // lấy động tên và avatar của người dùng đã đăng nhập (thông qua email vì người dùng đăng nhập bằng email)
+        // get email  (username là email)
+        String email = authentication.getName();
+        // query user
+        User user = this.userService.getUserByEmail(email);
+        if (  user != null) {
+            
+            session.setAttribute("fullName", user.getFullname());
+            session.setAttribute("avatar", user.getAvatar());
+        }
+        ;
     }
 
     private RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-            Authentication authentication) throws IOException, ServletException {
+                Authentication authentication) throws IOException, ServletException {
 
         // xác định URL đích dựa trên quyền của người dùng đã đăng nhập (authentication)
         String targetUrl = determineTargetUrl(authentication);
@@ -93,7 +113,7 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
         redirectStrategy.sendRedirect(request, response, targetUrl);
 
         // dọn dẹp session
-        clearAuthenticationAttributes(request);
+        clearAuthenticationAttributes(request, authentication);
     }
 
 }

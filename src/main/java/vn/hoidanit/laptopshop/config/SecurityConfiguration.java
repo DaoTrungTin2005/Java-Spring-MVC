@@ -112,11 +112,16 @@ public class SecurityConfiguration {
 
 
                 .sessionManagement((sessionManagement) -> sessionManagement 
+                // nếu người dùng chưa có session thì sẽ tạo session mới
                 .sessionCreationPolicy(SessionCreationPolicy.ALWAYS) 
+                // nếu session đã hết hạn thì sẽ redirect về trang logout với query param expired
                 .invalidSessionUrl("/logout?expired") 
+                //  giới hạn số lượng session cho mỗi người dùng
                 .maximumSessions(1) 
+                // người sau đăng nhập sẽ đá người trước ra khỏi session
                 .maxSessionsPreventsLogin(false)) 
 
+                // mỗi lần đăng xuat sẽ xóa cookie JSESSIONID và hủy session HTTP
                 .logout(logout->logout.deleteCookies("JSESSIONID").invalidateHttpSession(true)) 
 
 // cái này khi tắt browser đi thì nó sẽ nhớ đăng nhập

@@ -102,6 +102,7 @@ public class SecurityConfiguration {
 
                 .anyRequest().authenticated())
 
+                
                 .formLogin(formLogin -> formLogin
                         .loginPage("/login")
                         // khi login failed nó dẫn tới link này

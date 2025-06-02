@@ -37,6 +37,8 @@ public class CustomUserDetailsService implements UserDetailsService {
                 user.getPassword(),
                 // role là 1 đối tượng
                 // lấy động role theo database
+                // chuyển role thành danh sách quyền (authorities) để trả về
+                
                 Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRole().getName())));
     }
 }

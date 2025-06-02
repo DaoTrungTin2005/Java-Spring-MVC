@@ -7,11 +7,13 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.session.security.web.authentication.SpringSessionRememberMeServices;
 
 import jakarta.servlet.DispatcherType;
 import vn.hoidanit.laptopshop.service.CustomUserDetailsService;
@@ -59,13 +61,20 @@ public class SecurityConfiguration {
         return authProvider;
     }
 
-
     @Bean
-    public AuthenticationSuccessHandler customSuccessHandler(){
+    public AuthenticationSuccessHandler customSuccessHandler() {
         return new CustomSuccessHandler();
     }
 
-
+    // cái này khi tắt browser đi thì nó sẽ nhớ đăng nhập
+    // nếu muốn tắt trình duyệt did đăng nhập lại thì xóa cái này đi
+    @Bean
+    public SpringSessionRememberMeServices rememberMeServices() {
+        SpringSessionRememberMeServices rememberMeServices = new SpringSessionRememberMeServices();
+        // optionally customize
+        rememberMeServices.setAlwaysRemember(true);
+        return rememberMeServices;
+    }
 
     // dòng code này trang login của bản thân sẽ hiện ra thay cho trang login của
     // spring security
@@ -89,33 +98,43 @@ public class SecurityConfiguration {
 
                 // giao diện admin chỉ có admin mới dc dô
 
-//        Đây là phần cấu hình bảo mật: chặn người không có quyền truy cập trang admin.
+                // Đây là phần cấu hình bảo mật: chặn người không có quyền truy cập trang admin.
 
-// Nếu user cố tình truy cập /admin, Spring sẽ kiểm tra role.
+                // Nếu user cố tình truy cập /admin, Spring sẽ kiểm tra role.
 
-// Nếu không có ROLE_ADMIN → 403 Forbidden.
+                // Nếu không có ROLE_ADMIN → 403 Forbidden.
 
-// ➡️ Đây là logic phân quyền, để ngăn chặn truy cập trái phép.
-
+                // ➡️ Đây là logic phân quyền, để ngăn chặn truy cập trái phép.
 
                 .requestMatchers("/admin/**").hasRole("ADMIN")
 
                 .anyRequest().authenticated())
 
-                
+
+                .sessionManagement((sessionManagement) -> sessionManagement 
+                .sessionCreationPolicy(SessionCreationPolicy.ALWAYS) 
+                .invalidSessionUrl("/logout?expired") 
+                .maximumSessions(1) 
+                .maxSessionsPreventsLogin(false)) 
+
+                .logout(logout->logout.deleteCookies("JSESSIONID").invalidateHttpSession(true)) 
+
+// cái này khi tắt browser đi thì nó sẽ nhớ đăng nhập
+                .rememberMe(r -> r.rememberMeServices(rememberMeServices()))
+
                 .formLogin(formLogin -> formLogin
                         .loginPage("/login")
                         // khi login failed nó dẫn tới link này
                         .failureUrl("/login?error")
 
-                        // truyền vô cái hàm 
+                        // truyền vô cái hàm
                         .successHandler(customSuccessHandler())
                         .permitAll())
-                        // user mà đăng nhập dô trang admin thì sẽ dô cái đường link /access-deny
+                // user mà đăng nhập dô trang admin thì sẽ dô cái đường link /access-deny
 
-                        // định nghía /access-deny ở homepageController
+                // định nghía /access-deny ở homepageController
 
-                        .exceptionHandling(ex -> ex.accessDeniedPage("/access-deny"));
+                .exceptionHandling(ex -> ex.accessDeniedPage("/access-deny"));
 
         return http.build();
     }

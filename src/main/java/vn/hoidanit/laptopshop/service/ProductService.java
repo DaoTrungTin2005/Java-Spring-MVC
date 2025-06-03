@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import jakarta.servlet.http.HttpSession;
 import vn.hoidanit.laptopshop.domain.Cart;
 import vn.hoidanit.laptopshop.domain.CartDetail;
 import vn.hoidanit.laptopshop.domain.Product;
@@ -46,7 +47,7 @@ public class ProductService {
     }
 
     // truyền vô email để biết ng dùng là ai
-    public void handleAddProductToCart(String email, long productId) {
+    public void handleAddProductToCart(String email, long productId,HttpSession session) {
         // check user đã có cart chưa -> nếu chưa thì tạo mới cart
         User user = this.userService.getUserByEmail(email);
         if (user != null) {
@@ -55,7 +56,7 @@ public class ProductService {
                 // tạo mới cart
                 Cart otherCart = new Cart();
                 otherCart.setUser(user);
-                otherCart.setSum(1);
+                otherCart.setSum(0);
 
                 cart = this.cartRepository.save(otherCart);
             }
@@ -81,6 +82,14 @@ public class ProductService {
                     cd.setQuantity(1);
 
                     this.cartDetailRepository.save(cd);
+
+                    // update cart sum
+                    int s = cart.getSum() + 1;
+                    cart.setSum(s);
+                    this.cartRepository.save(cart);
+
+                    // cập nhật session, cái giỏ hàng ko cần out ra để nó cập nhật giỏ hàng
+                    session.setAttribute("sum", s);
                 } else {
                     oldDetail.setQuantity(oldDetail.getQuantity() + 1);
                     this.cartDetailRepository.save(oldDetail);

@@ -57,7 +57,7 @@ public class ProductService {
                 otherCart.setUser(user);
                 otherCart.setSum(1);
 
-                cart =  this.cartRepository.save(otherCart);
+                cart = this.cartRepository.save(otherCart);
             }
 
             // lưu cart_detail
@@ -68,17 +68,25 @@ public class ProductService {
             if (productOptional.isPresent()) {
                 Product realProduct = productOptional.get();
 
-                // logic lưu cart_detail
-                CartDetail cd = new CartDetail();
-                cd.setCart(cart);
-                cd.setProduct(realProduct);
-                cd.setPrice(realProduct.getPrice());
-                cd.setQuantity(1);
+                // check sản phẩm đã được thêm vào giỏ hàng trc đây chưa
+                CartDetail oldDetail = this.cartDetailRepository.findByCartAndProduct(cart, realProduct);
 
-                this.cartDetailRepository.save(cd);
+                if (oldDetail == null) {
+
+                    // logic lưu cart_detail
+                    CartDetail cd = new CartDetail();
+                    cd.setCart(cart);
+                    cd.setProduct(realProduct);
+                    cd.setPrice(realProduct.getPrice());
+                    cd.setQuantity(1);
+
+                    this.cartDetailRepository.save(cd);
+                } else {
+                    oldDetail.setQuantity(oldDetail.getQuantity() + 1);
+                    this.cartDetailRepository.save(oldDetail);
+
+                }
             }
-
-
 
         }
     }

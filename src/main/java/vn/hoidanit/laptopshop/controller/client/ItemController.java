@@ -33,10 +33,10 @@ public class ItemController {
         return "client/product/detail";
     }
 
-    // truyền vô session thì log out mới chạy dc 
+    // truyền vô session thì log out mới chạy dc
     @PostMapping("add-product-to-cart/{id}")
     public String postMethodName(@PathVariable long id, HttpServletRequest request) {
-         HttpSession session = request.getSession(false);
+        HttpSession session = request.getSession(false);
         long productId = id;
         String email = (String) session.getAttribute("email");
         this.productService.handleAddProductToCart(email, productId);
@@ -45,8 +45,8 @@ public class ItemController {
     }
 
     @GetMapping("/cart")
-    public String getCartPage(Model model){
-        return "client/cart/show" ;
+    public String getCartPage(Model model) {
+        return "client/cart/show";
     }
 
 }

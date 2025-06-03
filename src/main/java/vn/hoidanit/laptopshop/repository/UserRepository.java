@@ -7,16 +7,17 @@ import org.springframework.stereotype.Repository;
 import vn.hoidanit.laptopshop.domain.User;
 import java.util.List;
 
-
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
     User save(User tindaoit);
+
     List<User> findOneByEmail(String email);
 
-    User  findById(long id);
-    void deleteById(long id) ; 
+    User findById(long id);
 
-    boolean  existsByEmail(String email) ; 
+    void deleteById(long id);
 
-    User findByEmail (String email) ; 
+    boolean existsByEmail(String email);
+
+    User findByEmail(String email);
 }

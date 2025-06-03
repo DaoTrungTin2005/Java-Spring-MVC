@@ -48,6 +48,7 @@ public class ProductService {
 
     // truyền vô email để biết ng dùng là ai
     public void handleAddProductToCart(String email, long productId,HttpSession session) {
+
         // check user đã có cart chưa -> nếu chưa thì tạo mới cart
         User user = this.userService.getUserByEmail(email);
         if (user != null) {
@@ -99,4 +100,10 @@ public class ProductService {
 
         }
     }
+
+    // tìm giỏ hàng theo user
+    public Cart fetchByUser(User user) {
+        return this.cartRepository.findByUser(user);
 }
+}
+

@@ -25,7 +25,6 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
     @Autowired
     private UserService userService;
 
-
     // Phương thức này sẽ được gọi khi người dùng đăng nhập thành công
     // và sẽ xác định URL đích dựa trên quyền của người dùng đã đăng nhập.
     protected String determineTargetUrl(final Authentication authentication) {
@@ -80,19 +79,19 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
         // thuộc tính này được sử dụng để lưu trữ thông tin về lỗi xác thực nếu có
         session.removeAttribute(WebAttributes.AUTHENTICATION_EXCEPTION);
 
-
-        // lấy động tên và avatar của người dùng đã đăng nhập (thông qua email vì người dùng đăng nhập bằng email)
-        // get email  (username là email)
+        // lấy động tên và avatar của người dùng đã đăng nhập (thông qua email vì người
+        // dùng đăng nhập bằng email)
+        // get email (username là email)
         String email = authentication.getName();
         // query user
         User user = this.userService.getUserByEmail(email);
-        if (  user != null) {
-            
+        if (user != null) {
+
             session.setAttribute("fullName", user.getFullname());
             session.setAttribute("avatar", user.getAvatar());
             session.setAttribute("id", user.getId());
             session.setAttribute("email", user.getEmail());
-            int sum = user.getCart().getSum();
+            int sum = user.getCart() == null ? 0 : user.getCart().getSum();
             session.setAttribute("sum", sum);
 
         }
@@ -103,7 +102,7 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-                Authentication authentication) throws IOException, ServletException {
+            Authentication authentication) throws IOException, ServletException {
 
         // xác định URL đích dựa trên quyền của người dùng đã đăng nhập (authentication)
         String targetUrl = determineTargetUrl(authentication);
@@ -112,7 +111,7 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
 
             return;
         }
-// sử dụng redirectStrategy để chuyển hướng người dùng đến URL đích
+        // sử dụng redirectStrategy để chuyển hướng người dùng đến URL đích
         // redirectStrategy là một đối tượng được sử dụng để thực hiện việc chuyển
         // hướng (redirect) người dùng đến một URL khác
         redirectStrategy.sendRedirect(request, response, targetUrl);

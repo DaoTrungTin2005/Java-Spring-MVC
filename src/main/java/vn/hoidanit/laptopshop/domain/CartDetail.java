@@ -21,6 +21,7 @@ public class CartDetail {
     private double price;
 
     //card_id long
+    // 1 bảng ghi chỉ thuộc 1 giỏ hàng
     @ManyToOne
     @JoinColumn(name = "cart_id")
     private Cart cart;

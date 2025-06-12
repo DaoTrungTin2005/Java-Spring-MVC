@@ -2,6 +2,8 @@ package vn.hoidanit.laptopshop.controller.client;
 
 import java.util.List;
 
+import javax.swing.Spring;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,35 +41,62 @@ public class ItemController {
     }
 
     // truyền vô session thì log out mới chạy dc
+
+    // Đoạn code này là xử lý khi người dùng nhấn nút "Thêm vào giỏ hàng" trên
+    // website.
+
+    // Spring sẽ tự động lấy giá trị id từ URL.
+    // Ví dụ: Khi bạn gửi POST tới /add-product-to-cart/5, thì {id} sẽ là 5.
     @PostMapping("add-product-to-cart/{id}")
+
+    // Annotation @PathVariable long id giúp Spring lấy giá trị id từ URL và gán vào
+    // biến id trong method.
+
+    // HttpServletRequest request : là đối tượng đại diện cho request (yêu cầu) HTTP
+    // mà trình duyệt gửi lên server.
+
+    // Chức năng:
+    // Trong code của bạn, thường dùng để:
+    // Lấy session hiện tại: HttpSession session = request.getSession(false);
+    // Lấy thông tin user đang đăng nhập từ session.
+
     public String postMethodName(@PathVariable long id, HttpServletRequest request) {
+
+        // HttpSession session = request.getSession(false);:
+        // Lấy session hiện tại của user (để lấy thông tin user đang đăng nhập).
         HttpSession session = request.getSession(false);
 
+        // long productId = id;: Lấy id sản phẩm từ URL.
         long productId = id;
+
+        // String email = (String) session.getAttribute("email");:
+        // Lấy email user đã lưu trong session (để xác định user nào đang thêm sản phẩm).
         String email = (String) session.getAttribute("email");
+
+        // this.productService.handleAddProductToCart(email, productId, session);:
+        // Gọi hàm xử lý thêm sản phẩm vào giỏ hàng cho user này.
         this.productService.handleAddProductToCart(email, productId, session);
 
         return "redirect:/";
     }
 
-    //  Chi tiết giỏ hàng
+    // Chi tiết giỏ hàng
     @GetMapping("/cart")
-    public String getCartPage(Model model,HttpServletRequest request) {
+    public String getCartPage(Model model, HttpServletRequest request) {
         User currentUser = new User();
         HttpSession session = request.getSession(false);
         long id = (long) session.getAttribute("id");
         currentUser.setId(id);
 
         Cart cart = this.productService.fetchByUser(currentUser);
-        
-        List<CartDetail> cartDetails =cart.getCartDetails();
+
+        List<CartDetail> cartDetails = cart.getCartDetails();
 
         double totalPrice = 0;
         for (CartDetail cd : cartDetails) {
             totalPrice += cd.getProduct().getPrice() * cd.getQuantity();
         }
 
-       
         model.addAttribute("cartDetails", cartDetails);
         model.addAttribute("totalPrice", totalPrice);
 

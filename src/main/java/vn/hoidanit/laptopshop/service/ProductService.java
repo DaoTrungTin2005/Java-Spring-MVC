@@ -46,13 +46,27 @@ public class ProductService {
         this.productRepository.deleteById(id);
     }
 
-    // truyền vô email để biết ng dùng là ai
-    public void handleAddProductToCart(String email, long productId,HttpSession session) {
+    // =============================================================================
+    // Đây là hàm xử lý logic khi người dùng nhấn "Thêm vào giỏ hàng"
+    // Nó sẽ đảm bảo mỗi user có 1 giỏ hàng, và mỗi lần thêm sản phẩm sẽ cập nhật
+    // đúng vào giỏ hàng của user đó.
 
-        // check user đã có cart chưa -> nếu chưa thì tạo mới cart
+    // truyền vô email để biết ng dùng là ai
+    public void handleAddProductToCart(String email, long productId, HttpSession session) {
+
+        // Lấy user từ email. Xác định user đang thao tác.
         User user = this.userService.getUserByEmail(email);
+
         if (user != null) {
+            // Kiểm tra user đã có giỏ hàng chưa:
             Cart cart = this.cartRepository.findByUser(user);
+
+            // Nếu chưa có (cart == null):
+            // Tạo mới một đối tượng Cart (giỏ hàng) cho user này.
+            // Gán user cho cart, set tổng số sản phẩm (sum) ban đầu là 0.
+            // Lưu cart mới vào database.
+
+            // Nếu đã có, dùng lại giỏ hàng cũ.
             if (cart == null) {
                 // tạo mới cart
                 Cart otherCart = new Cart();
@@ -62,37 +76,62 @@ public class ProductService {
                 cart = this.cartRepository.save(otherCart);
             }
 
-            // lưu cart_detail
-            // tìm product theo id
-
-            // optional yêu cầu check xem có tồn tại hay không
+            // Optional<Product> productOptional =
+            // this.productRepository.findById(productId);
+            // Tìm sản phẩm trong database theo productId.
             Optional<Product> productOptional = this.productRepository.findById(productId);
+
+            // if (productOptional.isPresent()) { ... }
+            // Kiểm tra xem sản phẩm có tồn tại không.
+            // Nếu có, lấy ra đối tượng Product thực tế:
+            // Product realProduct = productOptional.get();
             if (productOptional.isPresent()) {
                 Product realProduct = productOptional.get();
 
-                // check sản phẩm đã được thêm vào giỏ hàng trc đây chưa
+                // CartDetail oldDetail = this.cartDetailRepository.findByCartAndProduct(cart,
+                // realProduct);
+
+                // Kiểm tra xem trong giỏ hàng (cart) đã có sản phẩm này (realProduct) chưa
+                // Nếu oldDetail == null: sản phẩm chưa có trong giỏ, sẽ thêm mới
+                // Nếu oldDetail != null: sản phẩm đã có, sẽ tăng số lượng
                 CartDetail oldDetail = this.cartDetailRepository.findByCartAndProduct(cart, realProduct);
 
+                // trường hợp sản phẩm chưa có trong giỏ hàng
                 if (oldDetail == null) {
 
-                    // logic lưu cart_detail
                     CartDetail cd = new CartDetail();
-                    cd.setCart(cart);
-                    cd.setProduct(realProduct);
-                    cd.setPrice(realProduct.getPrice());
-                    cd.setQuantity(1);
+                    cd.setCart(cart); // Gán giỏ hàng hiện tại cho chi tiết giỏ hàng này
+                    cd.setProduct(realProduct); // Gán sản phẩm thực tế mà user vừa chọn
+                    cd.setPrice(realProduct.getPrice()); // Lưu giá sản phẩm tại thời điểm thêm vào giỏ
+                    cd.setQuantity(1); // Số lượng sản phẩm là 1 (vì mới thêm lần đầu)
 
-                    this.cartDetailRepository.save(cd);
+                    this.cartDetailRepository.save(cd); // Lưu chi tiết giỏ hàng này vào database
 
-                    // update cart sum
+                    // cart.getSum() + 1: Lấy tổng số sản phẩm hiện tại trong giỏ và tăng lên 1 (vì
+                    // vừa thêm sản phẩm mới).
                     int s = cart.getSum() + 1;
+
+                    // cart.setSum(s): Gán lại tổng số sản phẩm mới cho đối tượng giỏ hàng.
                     cart.setSum(s);
+
+                    // this.cartRepository.save(cart): Lưu lại giỏ hàng vào database để cập nhật
+                    // tổng số sản phẩm.
                     this.cartRepository.save(cart);
 
                     // cập nhật session, cái giỏ hàng ko cần out ra để nó cập nhật giỏ hàng
+                    // sẽ lưu tên sum vào session.
+
                     session.setAttribute("sum", s);
-                } else {
+                }
+                // xử lý trường hợp sản phẩm đã có trong giỏ hàng của user:
+                else {
+
+                    // Lấy số lượng hiện tại của sản phẩm đó trong giỏ (oldDetail.getQuantity()).
+                    // Tăng số lượng lên 1 (oldDetail.setQuantity(oldDetail.getQuantity() + 1);).
                     oldDetail.setQuantity(oldDetail.getQuantity() + 1);
+
+                    // Lưu lại bản ghi CartDetail này vào database
+                    // (this.cartDetailRepository.save(oldDetail);).
                     this.cartDetailRepository.save(oldDetail);
 
                 }
@@ -104,6 +143,5 @@ public class ProductService {
     // tìm giỏ hàng theo user
     public Cart fetchByUser(User user) {
         return this.cartRepository.findByUser(user);
+    }
 }
-}
-

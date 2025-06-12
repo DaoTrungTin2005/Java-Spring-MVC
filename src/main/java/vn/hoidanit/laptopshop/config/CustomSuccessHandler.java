@@ -91,7 +91,35 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
             session.setAttribute("avatar", user.getAvatar());
             session.setAttribute("id", user.getId());
             session.setAttribute("email", user.getEmail());
+
+            // =====================================================
+            // user.getCart() == null ? 0 : user.getCart().getSum();
+            // Nếu user chưa có giỏ hàng (getCart() == null), thì sum sẽ là 0.
+            // Nếu user đã có giỏ hàng, thì lấy tổng số sản phẩm trong giỏ
+            // (getCart().getSum()).
             int sum = user.getCart() == null ? 0 : user.getCart().getSum();
+
+            // Lưu giá trị sum vào session với tên "sum".
+
+            // session.setAttribute("sum", sum);
+            // → Được dùng khi user vừa đăng nhập thành công (trong CustomSuccessHandler).
+            // → Lấy tổng số sản phẩm hiện có trong giỏ hàng của user từ database và lưu vào
+            // session.
+
+            // session.setAttribute("sum", s);
+            // → Được dùng khi user vừa thêm sản phẩm vào giỏ hàng (trong ProductService).
+            // → Cập nhật lại số lượng sản phẩm trong session mỗi lần thêm mới.
+
+            // ==================================
+            // ${sessionScope.sum} sẽ hiển thị giá trị cuối cùng được lưu vào session với
+            // key là "sum".
+
+            // Khi user đăng nhập thành công, dòng : session.setAttribute("sum", sum);
+            // trong CustomSuccessHandler sẽ set số lượng sản phẩm hiện có trong giỏ hàng
+            // vào session.
+
+            // Khi user thêm sản phẩm vào giỏ, dòng : session.setAttribute("sum", s);
+            // trong ProductService sẽ cập nhật lại số lượng sản phẩm mới nhất vào session.
             session.setAttribute("sum", sum);
 
         }

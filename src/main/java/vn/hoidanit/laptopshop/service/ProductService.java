@@ -140,8 +140,11 @@ public class ProductService {
         }
     }
 
+    // ============================================================================
     // tìm giỏ hàng theo user
     public Cart fetchByUser(User user) {
         return this.cartRepository.findByUser(user);
     }
+
+    // ============================================================================
 }

@@ -62,18 +62,48 @@
                 <div class="table-responsive">
                     <table class="table">
                         <thead>
-                          <tr>
+                        <tr>
                             <th scope="col">Products</th>
                             <th scope="col">Name</th>
                             <th scope="col">Price</th>
                             <th scope="col">Quantity</th>
                             <th scope="col">Total</th>
                             <th scope="col">Handle</th>
-                          </tr>
+                        </tr>
                         </thead>
                         <tbody>
+                            <%-- Nên Nhớ Lúc bên Controller truyền vô là cartDetails --%>
+
+                            <%-- Giải thích vì sao phải ghi là cartDetail.product.image chứ không ghi product.image--%>
+
+                            <%-- 1. Scope của biến trong vòng lặp
+                            Trong vòng lặp này, biến bạn có là cartDetail, không phải product.
+                            cartDetail là từng dòng chi tiết giỏ hàng, mỗi dòng chứa thông tin sản phẩm, số lượng, giá...
+
+                            2. Lấy thông tin sản phẩm qua cartDetail
+                            Để lấy hình ảnh sản phẩm, bạn phải đi qua đối tượng cartDetail:
+
+                            3. Không có biến product trong scope
+                            Nếu bạn ghi ${product.image} trong vòng lặp này, JSP sẽ không biết lấy product ở đâu (vì không có biến product trong scope hiện tại), dẫn đến lỗi hoặc không hiển thị gì. --%>
+                            <%-- Lúc bên Controller truyền vô là cartDetails mà --%>
+
+                            <%-- Bạn phải truyền cartDetails (danh sách CartDetail) vào view, không thể chỉ truyền product, vì:
+
+                            1. Giỏ hàng cần nhiều thông tin hơn chỉ mỗi sản phẩm
+                            CartDetail chứa:
+                            Sản phẩm nào (product)
+                            Số lượng sản phẩm đó trong giỏ (quantity)
+                            Giá tại thời điểm thêm vào giỏ (price)
+                            Nếu chỉ truyền product, bạn không biết số lượng từng sản phẩm trong giỏ, cũng không biết giá lúc thêm vào (nếu giá có thể thay đổi).
+
+                            2. View giỏ hàng cần hiển thị gì?
+                            Tên, ảnh, giá sản phẩm (cartDetail.product)
+                            Số lượng sản phẩm trong giỏ (cartDetail.quantity)
+                            Tổng tiền từng dòng (cartDetail.price * cartDetail.quantity)
+                            Nếu chỉ truyền product, bạn không thể biết số lượng và không thể tính tổng tiền từng dòng. --%>
                             <c:forEach var = "cartDetail" items="${cartDetails}">
                             <tr>
+
                                 <th scope="row">
                                     <div class="d-flex align-items-center">
                                         <img src="/images/product/${cartDetail.product.image}" 
@@ -81,6 +111,7 @@
                                         style="width: 80px; height: 80px;" alt="">
                                     </div>
                                 </th>
+
                                 <td>
                                     <p class="mb-0 mt-4">
                                         <a href="/product/${cartDetail.product.id}" target="blank">
@@ -88,11 +119,12 @@
                                         </a>
                                     </p>
                                 </td>
+
                                 <td>
                                     <p class="mb-0 mt-4">
-                                       <fmt:formatNumber type="number"
-                                       value ="${cartDetail.product.price}"
-                                       /> đ
+                                    <fmt:formatNumber type="number"
+                                    value ="${cartDetail.product.price}"
+                                    /> đ
 
                                     </p>
                                 </td>

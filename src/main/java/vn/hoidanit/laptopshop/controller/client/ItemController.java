@@ -70,7 +70,8 @@ public class ItemController {
         long productId = id;
 
         // String email = (String) session.getAttribute("email");:
-        // Lấy email user đã lưu trong session (để xác định user nào đang thêm sản phẩm).
+        // Lấy email user đã lưu trong session (để xác định user nào đang thêm sản
+        // phẩm).
         String email = (String) session.getAttribute("email");
 
         // this.productService.handleAddProductToCart(email, productId, session);:
@@ -83,21 +84,51 @@ public class ItemController {
     // Chi tiết giỏ hàng
     @GetMapping("/cart")
     public String getCartPage(Model model, HttpServletRequest request) {
+
+        // Tạo một đối tượng User mới (chỉ là object rỗng ban đầu).
         User currentUser = new User();
+
+        // Lấy session hiện tại của user (nếu chưa có session thì trả về null).
+        // Session này chứa các thông tin đã lưu khi user đăng nhập (ví dụ: id,
+        // email...).
         HttpSession session = request.getSession(false);
+
+        // Lấy thuộc tính "id" từ session, đây là id của user đang đăng nhập.
         long id = (long) session.getAttribute("id");
+
+        // Gán id vừa lấy được vào đối tượng User vừa tạo.
+        // Bây giờ, currentUser đại diện cho user đang đăng nhập (ít nhất là về mặt id).
         currentUser.setId(id);
 
+        // Lấy giỏ hàng (Cart) của user hiện tại từ database.
+        // tìm bản ghi giỏ hàng (Cart) ứng với user truyền vào
         Cart cart = this.productService.fetchByUser(currentUser);
 
+        // Từ đối tượng giỏ hàng vừa lấy được, lấy ra danh sách các sản phẩm mà user đã
+        // thêm vào giỏ.
+        // Mỗi phần tử trong danh sách này là một CartDetail (chi tiết giỏ hàng), chứa
+        // thông tin: sản phẩm nào, số lượng bao nhiêu, giá lúc thêm vào...
         List<CartDetail> cartDetails = cart.getCartDetails();
 
+        // Khởi tạo biến totalPrice để tính tổng tiền.
+        // Duyệt qua từng sản phẩm trong giỏ (cartDetails):
+        // Lấy giá sản phẩm (cd.getProduct().getPrice())
+        // Nhân với số lượng sản phẩm đó trong giỏ (cd.getQuantity())
+        // Cộng dồn vào totalPrice.
         double totalPrice = 0;
         for (CartDetail cd : cartDetails) {
             totalPrice += cd.getProduct().getPrice() * cd.getQuantity();
         }
 
+        // Đưa danh sách các sản phẩm trong giỏ hàng (cartDetails - kiểu
+        // List<CartDetail>) sang view.
+        // Trong JSP, bạn sẽ dùng ${cartDetails} để lặp qua và hiển thị từng sản phẩm
+        // trong giỏ.
         model.addAttribute("cartDetails", cartDetails);
+
+        // Đưa tổng tiền của giỏ hàng (totalPrice) sang view.
+        // Trong JSP, bạn sẽ dùng ${totalPrice} để hiển thị tổng tiền mà user phải thanh
+        // toán.
         model.addAttribute("totalPrice", totalPrice);
 
         return "client/cart/show";

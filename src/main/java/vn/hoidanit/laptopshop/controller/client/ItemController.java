@@ -157,5 +157,23 @@ public class ItemController {
 
         return "client/cart/show";
     }
+    // ================================================================
+
+    // Truyền id để biết cần xóa dòng nào trong giỏ hàng (mỗi dòng là một
+    // CartDetail, có id riêng).
+    // Nếu không truyền id, bạn sẽ không biết user muốn xóa sản phẩm nào.
+
+    @PostMapping("/delete-cart-product/{id}")
+    public String deleteCartDetail(@PathVariable long id, HttpServletRequest request) {
+
+        // Truyền vào id để biết xóa cartDetail nào, truyền session để hiện số sản phẩm
+        // có trong giỏ
+        HttpSession session = request.getSession(false);
+        long CartDetailId = id;
+
+        // Logic bên service xử lí
+        this.productService.handleRemoveCartDetail(CartDetailId, session);
+        return "redirect:/cart";
+    }
 
 }

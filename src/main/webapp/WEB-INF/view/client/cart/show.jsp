@@ -130,7 +130,8 @@
                                 </td>
 
                                 <td>
-                                    <div class="input-group quantity mt-4" style="width: 100px;">
+                                    <div class="input-group quantity mt-4" style="width: 100px;">\
+
                                         <div class="input-group-btn">
                                             <button class="btn btn-sm btn-minus rounded-circle bg-light border" >
                                             <i class="fa fa-minus"></i>
@@ -168,10 +169,14 @@
                                     </p>
                                 </td>
 
+                                <%-- Xóa sản phẩm trong giỏ hàng --%>
                                 <td>
+                                <form method="post" action="/delete-cart-product/${cartDetail.id}">
+                                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
                                     <button class="btn btn-md rounded-circle bg-light border mt-4" >
                                         <i class="fa fa-times text-danger"></i>
-                                    </button>
+                                    </button
+                                </form>
                                 </td>
 
                             </tr>

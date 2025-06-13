@@ -147,4 +147,45 @@ public class ProductService {
     }
 
     // ============================================================================
+    // Hàm này xóa một sản phẩm khỏi giỏ hàng, cập nhật lại tổng số sản phẩm và
+    // session.
+
+    public void handleRemoveCartDetail(long CartDetailId, HttpSession session) {
+
+        // Tìm bản ghi chi tiết giỏ hàng (CartDetail) theo id. Nếu tìm thấy, lấy ra đối
+        // tượng cartDetail.
+        Optional<CartDetail> cartDetaiOptional = this.cartDetailRepository.findById(CartDetailId);
+        if (cartDetaiOptional.isPresent()) {
+            CartDetail cartDetail = cartDetaiOptional.get();
+
+            // Lấy đối tượng giỏ hàng (Cart) chứa sản phẩm này.
+            Cart currentCart = cartDetail.getCart();
+
+            // Xóa CartDetail khỏi database. Xóa sản phẩm này khỏi giỏ hàng trong database.
+            this.cartDetailRepository.deleteById(CartDetailId);
+
+            // Cập nhật lại tổng số sản phẩm trong giỏ hàng
+
+            // Nếu giỏ hàng còn nhiều hơn 1 sản phẩm:
+            // Giảm tổng số sản phẩm (sum) đi 1.
+            // Lưu lại giỏ hàng vào database.
+            // Cập nhật lại số lượng sản phẩm trong session để giao diện hiển thị đúng
+            if (currentCart.getSum() > 1) {
+
+                int s = currentCart.getSum() - 1;
+                currentCart.setSum(s);
+                session.setAttribute("sum", s);
+                this.cartRepository.save(currentCart);
+
+                // Nếu chỉ còn 1 sản phẩm (sau khi xóa là hết)
+                // Nếu đây là sản phẩm cuối cùng:
+                // Xóa luôn giỏ hàng khỏi database.
+                // Đặt số lượng sản phẩm trong session về 0.
+            } else {
+
+                this.cartRepository.deleteById(currentCart.getId());
+                session.setAttribute("sum", 0);
+            }
+        }
+    }
 }

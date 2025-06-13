@@ -128,6 +128,7 @@
 
                                     </p>
                                 </td>
+
                                 <td>
                                     <div class="input-group quantity mt-4" style="width: 100px;">
                                         <div class="input-group-btn">
@@ -135,29 +136,44 @@
                                             <i class="fa fa-minus"></i>
                                             </button>
                                         </div>
-                                        <input type="text" class="form-control form-control-sm text-center border-0" 
-                                        value="${cartDetail.quantity}">
+
+                                        <input type="text" class="form-control form-control-sm text-center border-0"
+                                        value="${cartDetail.quantity}"
+
+                                        <%-- Nói chung cái chức năng tăng giảm số lượng rồi giá tiền tăng theo thì nó bên javascript --%>
+                                        <%--data-cart-detail-id , data-cart-detail-price , data-cart-total-price à HTML data attributes (thuộc tính dữ liệu tùy chỉnh) dùng để truyền dữ liệu từ server sang client (JavaScript). 
+                                        Tóm lại: Các thuộc tính này giúp JavaScript dễ dàng lấy đúng dữ liệu để xử lý tăng/giảm số lượng, cập nhật giá tiền từng dòng và tổng tiền giỏ hàng ngay trên giao diện mà không cần reload trang. --%>
+
+                                        <%-- Cần có id để định danh nó là ai --%>
+                                        data-cart-detail-id="${cartDetail.id}"
+
+                                        <%-- Cần có price để khi bấm nút tăng giảm giá tiền cũng tăng giảm theo (lấy số lượng nhân giá cả) --%>
+                                        data-cart-detail-price="${cartDetail.price}"
+                                        >
 
                                         <div class="input-group-btn">
                                             <button class="btn btn-sm btn-plus rounded-circle bg-light border">
                                                 <i class="fa fa-plus"></i>
                                             </button>
                                         </div>
+
                                     </div>
                                 </td>
 
                                 <td>
-                                    <p class="mb-0 mt-4">
+                                    <%-- Thêm vô ${cartDetail.id} để biết đích danh ô input nào (đích danh phần tử HTML nào) cần phải cập nhật --%>
+                                    <p class="mb-0 mt-4" data-cart-detail-id="${cartDetail.id}">
                                         <fmt:formatNumber type="number"
                                         value ="${cartDetail.price * cartDetail.quantity}" /> đ
                                     </p>
                                 </td>
+
                                 <td>
                                     <button class="btn btn-md rounded-circle bg-light border mt-4" >
                                         <i class="fa fa-times text-danger"></i>
                                     </button>
                                 </td>
-                            
+
                             </tr>
                             </c:forEach>
 
@@ -172,7 +188,9 @@
                                 <h1 class="display-6 mb-4">Cart <span class="fw-normal">Total</span></h1>
                                 <div class="d-flex justify-content-between mb-4">
                                     <h5 class="mb-0 me-4">Subtotal:</h5>
-                                    <p class="mb-0">
+
+
+                                    <p class="mb-0" data-cart-total-price="${totalPrice}">
                                         <fmt:formatNumber type="number"
                                         value ="${totalPrice}" /> đ
                                     </p>
@@ -185,13 +203,17 @@
                                 </div>
                                 <p class="mb-0 text-end">Shipping to Ukraine.</p>
                             </div>
+
                             <div class="py-4 mb-4 border-top border-bottom d-flex justify-content-between">
                                 <h5 class="mb-0 ps-4 me-4">Total</h5>
-                                <p class="mb-0 pe-4">
+
+
+                                <p class="mb-0 pe-4" data-cart-total-price="${totalPrice}">
                                     <fmt:formatNumber type="number"
                                     value ="${totalPrice}" /> đ
                                 </p>
                             </div>
+
                             <button class="btn border-secondary rounded-pill px-4 py-3 text-primary text-uppercase mb-4 ms-4" type="button">Proceed Checkout</button>
                         </div>
                     </div>

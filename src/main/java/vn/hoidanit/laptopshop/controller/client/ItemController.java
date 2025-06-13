@@ -1,5 +1,6 @@
 package vn.hoidanit.laptopshop.controller.client;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.Spring;
@@ -108,7 +109,30 @@ public class ItemController {
         // thêm vào giỏ.
         // Mỗi phần tử trong danh sách này là một CartDetail (chi tiết giỏ hàng), chứa
         // thông tin: sản phẩm nào, số lượng bao nhiêu, giá lúc thêm vào...
-        List<CartDetail> cartDetails = cart.getCartDetails();
+
+        // Lúc này có 1 cái bug là lỡ như cái cart là null (user chưa có giỏ hàng) thì
+        // khi null mà gọi đến phương thức .getCartDetails() sẽ bị lỗi
+
+        // Cách xử lí : xài if/else
+        // Nếu cart là null (tức là user chưa có giỏ hàng, chưa từng thêm sản phẩm nào),
+        // thì gán cartDetails là một danh sách rỗng (new ArrayList<CartDetail>()).
+        // Nếu cart khác null (user đã có giỏ hàng),
+        // thì lấy danh sách sản phẩm trong giỏ: cart.getCartDetails().
+
+        // Tại sao dùng ArrayList :
+        // Bạn khai báo kiểu biến là List<CartDetail> để code linh hoạt.
+        // Nhưng khi tạo mới, bạn phải dùng một lớp cụ thể như ArrayList để tạo đối
+        // tượng thực tế.
+
+        // Ở đây dùng new ArrayList<CartDetail>() vì:
+        // ArrayList là một lớp cụ thể (concrete class) để tạo ra một danh sách rỗng.
+        // List là một interface (giao diện), bạn không thể tạo đối tượng trực tiếp từ
+        // interface.
+        // List<CartDetail> list1 = new ArrayList<>(); // Đúng
+        // List<CartDetail> list2 = new List<>(); // Sai, vì List là interface
+
+        // TÍnh đa hình nó tự động convert qua lại
+        List<CartDetail> cartDetails = cart == null ? new ArrayList<CartDetail>() : cart.getCartDetails();
 
         // Khởi tạo biến totalPrice để tính tổng tiền.
         // Duyệt qua từng sản phẩm trong giỏ (cartDetails):

@@ -11,7 +11,6 @@
     };
     spinner(0);
 
-
     // Fixed Navbar
     $(window).scroll(function () {
         if ($(window).width() < 992) {
@@ -29,20 +28,18 @@
         } 
     });
     
-    
-   // Back to top button
-   $(window).scroll(function () {
-    if ($(this).scrollTop() > 300) {
-        $('.back-to-top').fadeIn('slow');
-    } else {
-        $('.back-to-top').fadeOut('slow');
-    }
+    // Back to top button
+    $(window).scroll(function () {
+        if ($(this).scrollTop() > 300) {
+            $('.back-to-top').fadeIn('slow');
+        } else {
+            $('.back-to-top').fadeOut('slow');
+        }
     });
     $('.back-to-top').click(function () {
         $('html, body').animate({scrollTop: 0}, 1500, 'easeInOutExpo');
         return false;
     });
-
 
     // Testimonial carousel
     $(".testimonial-carousel").owlCarousel({
@@ -77,7 +74,6 @@
         }
     });
 
-
     // vegetable carousel
     $(".vegetable-carousel").owlCarousel({
         autoplay: true,
@@ -111,7 +107,6 @@
         }
     });
 
-
     // Modal Video
     $(document).ready(function () {
         var $videoSrc;
@@ -129,124 +124,97 @@
         })
     });
 
-
-
     // Product Quantity
-    // $('.quantity button').on('click', function () {
-    //     var button = $(this);
-    //     var oldValue = button.parent().parent().find('input').val();
-    //     if (button.hasClass('btn-plus')) {
-    //         var newVal = parseFloat(oldValue) + 1;
-    //     } else {
-    //         if (oldValue > 0) {
-    //             var newVal = parseFloat(oldValue) - 1;
-    //         } else {
-    //             newVal = 0;
-    //         }
-    //     }
-    //     button.parent().parent().find('input').val(newVal);
-    // });
+    //     Bắt sự kiện click vào nút tăng/giảm
+    // Khi bạn bấm nút "+" hoặc "-" ở cột số lượng, hàm này sẽ chạy.
+    $('.quantity button').on('click', function () {
+        let change = 0;
+        var button = $(this);
 
+        // Tính số lượng mới
+        // Nếu bấm "+", số lượng tăng lên 1.
+        // Nếu bấm "-", số lượng giảm đi 1 (nhưng không nhỏ hơn 1).
+        // Gán lại giá trị mới vào ô input.
+        // Lấy input hiển thị trong bảng giỏ hàng
+        const displayInput = button.parent().parent().find('input'); // Đây là input type="text" trong bảng
+        var oldValue = parseFloat(displayInput.val());
 
-//     Bắt sự kiện click vào nút tăng/giảm
-// Khi bạn bấm nút "+" hoặc "-" ở cột số lượng, hàm này sẽ chạy.
-        $('.quantity button').on('click', function () {
-    let change = 0;
-    var button = $(this);
-
-// Tính số lượng mới
-
-// Nếu bấm "+", số lượng tăng lên 1.
-// Nếu bấm "-", số lượng giảm đi 1 (nhưng không nhỏ hơn 1).
-// Gán lại giá trị mới vào ô input.
-    var oldValue = button.parent().parent().find('input').val();
-    if (button.hasClass('btn-plus')) {
-    var newVal = parseFloat(oldValue) + 1;
-    change = 1;
-    } else {
-        if (oldValue > 1) {
-        var newVal = parseFloat(oldValue) - 1;
-        change = -1;
+        if (button.hasClass('btn-plus')) {
+            var newVal = oldValue + 1;
+            change = 1;
         } else {
-        newVal = 1;
-}
-    }
-    const input = button.parent().parent().find('input');
-    input.val(newVal);
+            if (oldValue > 1) {
+                var newVal = oldValue - 1;
+                change = -1;
+            } else {
+                newVal = 1;
+            }
+        }
+        displayInput.val(newVal); // Cập nhật giá trị hiển thị
 
-//. Cập nhật giá tiền từng dòng
+        //set form index
+        const index = displayInput.attr("data-cart-detail-index");
+        // **Cập nhật ID cho đúng với format của Spring MVC và ID bạn đã đặt:**
+        // Tìm thẻ <form:input> ẩn (hoặc hiển thị) dùng để gửi dữ liệu
 
-//  Lấy giá sản phẩm và id của dòng hiện tại.
-// Tính lại tổng tiền của dòng đó = giá * số lượng mới.
-// Hiển thị lại giá tiền mới cho dòng đó.
-    const price = input.attr("data-cart-detail-price");
-    const id = input.attr("data-cart-detail-id");
+        // JavaScript cập nhật giá trị quantity trong form ẩn khi người dùng thay đổi số lượng
+        // Sử dụng index để xác định đúng input cần cập nhật
+        const hiddenFormInput = document.getElementById(`cartDetails${index}__quantity`);
+        if (hiddenFormInput) {
+            hiddenFormInput.value = newVal;
+        }
 
-    const priceElement = $(`p[data-cart-detail-id='${id}']`);
-    if (priceElement) {
-    const newPrice = +price* newVal;
-    priceElement.text(formatCurrency (newPrice.toFixed(2)) + "d");
-    }
+        //. Cập nhật giá tiền từng dòng
+        //  Lấy giá sản phẩm và id của dòng hiện tại.
+        // Tính lại tổng tiền của dòng đó = giá * số lượng mới.
+        // Hiển thị lại giá tiền mới cho dòng đó.
+        const price = displayInput.attr("data-cart-detail-price");
+        const id = displayInput.attr("data-cart-detail-id");
 
-//Cập nhật tổng tiền giỏ hàng
+        const priceElement = $(`p[data-cart-detail-id='${id}']`);
+        if (priceElement.length) { // Kiểm tra nếu phần tử tồn tại
+            const newPrice = +price * newVal;
+            priceElement.text(formatCurrency(newPrice.toFixed(2)) + "đ"); // Đã sửa "d" thành "đ" cho đúng tiền Việt
+        }
 
-// Lấy tổng tiền hiện tại.
-// Nếu tăng/giảm, cộng/trừ thêm giá của sản phẩm tương ứng.
-// Cập nhật lại tổng tiền trên giao diện.
-    const totalPriceElement = $(`p[data-cart-total-price]`);
+        //Cập nhật tổng tiền giỏ hàng
+        // Lấy tổng tiền hiện tại.
+        // Nếu tăng/giảm, cộng/trừ thêm giá của sản phẩm tương ứng.
+        // Cập nhật lại tổng tiền trên giao diện.
+        const totalPriceElement = $(`p[data-cart-total-price]`);
 
-    if (totalPriceElement && totalPriceElement.length) {
-        const currentTotal = totalPriceElement.first().attr("data-cart-total-price");
-        let newTotal = +currentTotal;
-        if (change === 0) {
-        newTotal = +currentTotal;
-        } else {
-        newTotal = change* (+price) + +currentTotal;
-    }
+        if (totalPriceElement && totalPriceElement.length) {
+            // Lấy tổng tiền hiện tại từ thuộc tính data-cart-total-price của phần tử đầu tiên
+            const currentTotal = parseFloat(totalPriceElement.first().attr("data-cart-total-price"));
+            let newTotal = currentTotal + (change * (+price));
 
-    //reset change
-    change = 0;
+            // Đảm bảo tổng tiền không âm nếu giá trị ban đầu là 0 hoặc rất nhỏ và bị trừ đi
+            if (newTotal < 0) {
+                newTotal = 0;
+            }
+            
+            //reset change
+            change = 0; // reset change sau khi đã dùng để tính newTotal
 
-    //update
-    totalPriceElement?.each(function (index, element) {
-    //update text
-    $(totalPriceElement[index]).text(formatCurrency (newTotal.toFixed(2)) + "đ" )
-
-    //update data-attribute
-    $(totalPriceElement [index]).attr("data-cart-total-price", newTotal);
-
-    });
-}
-
+            //update
+            totalPriceElement.each(function (idx, element) {
+                //update text
+                $(element).text(formatCurrency(newTotal.toFixed(2)) + "đ"); // Đã sửa "d" thành "đ"
+                //update data-attribute
+                $(element).attr("data-cart-total-price", newTotal);
+            });
+        }
     });
 
-//Định dạng số tiền theo kiểu Việt Nam (dùng dấu phẩy).
-
-    function formatCurrency (value) {
-    // Use the 'vi-VN' locale to format the number according to Vietnamese currency
-    // and 'VND' as the currency type for Vietnamese đồng
-    const formatter = new Intl.NumberFormat('vi-VN', {
+    //Định dạng số tiền theo kiểu Việt Nam (dùng dấu phẩy).
+    function formatCurrency(value) {
+        const formatter = new Intl.NumberFormat('vi-VN', {
             style: 'decimal',
-            minimumFractionDigits: 0, // No decimal part for whole numbers
-    });
+            minimumFractionDigits: 0, 
+        });
 
-    let formatted = formatter.format(value);
-    // Replace dots with commas for thousands separator
-    formatted = formatted.replace(/\./g,',');
-    return formatted;
-
-//     Tóm lại :
-// Khi bạn bấm nút tăng/giảm số lượng:
-// Số lượng sản phẩm sẽ thay đổi.
-// Giá tiền của dòng đó sẽ cập nhật lại.
-// Tổng tiền giỏ hàng cũng cập nhật lại ngay lập tức trên giao diện.
-// Tất cả đều xử lý bằng JavaScript, không cần reload trang.
-// Nếu bạn muốn cập nhật số lượng thực tế trong database, bạn cần gọi thêm Ajax về server khi bấm nút.
-// Đoạn này chỉ xử lý giao diện (frontend).
-
+        let formatted = formatter.format(value);
+        return formatted;
     }
-
-
 
 })(jQuery);
-

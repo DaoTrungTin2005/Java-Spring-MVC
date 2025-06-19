@@ -61,7 +61,6 @@
                                 <th scope="col">Price</th>
                                 <th scope="col">Quantity</th>
                                 <th scope="col">Total</th>
-                                <th scope="col">Handle</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -126,11 +125,6 @@
                                     <td>
                                         <div class="input-group quantity mt-4" style="width: 100px;">
 
-                                            <div class="input-group-btn">
-                                                <button class="btn btn-sm btn-minus rounded-circle bg-light border">
-                                                    <i class="fa fa-minus"></i>
-                                                </button>
-                                            </div>
 
                                             <%-- Đảm bảo các data-* attribute nằm TRONG thẻ input --%>
                                             <input type="text"
@@ -153,11 +147,6 @@
                                                 >
 
 
-                                            <div class="input-group-btn">
-                                                <button class="btn btn-sm btn-plus rounded-circle bg-light border">
-                                                    <i class="fa fa-plus"></i>
-                                                </button>
-                                            </div>
 
                                         </div>
                                     </td>
@@ -170,15 +159,6 @@
                                         </p>
                                     </td>
 
-                                    <%-- Xóa sản phẩm trong giỏ hàng --%>
-                                    <td>
-                                        <form method="post" action="/delete-cart-product/${cartDetail.id}">
-                                            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
-                                            <button class="btn btn-md rounded-circle bg-light border mt-4">
-                                                <i class="fa fa-times text-danger"></i>
-                                            </button>
-                                        </form>
-                                    </td>
 
                                 </tr>
                             </c:forEach>
@@ -187,7 +167,38 @@
                     </table>
                 </div>
 
-<%-- ============================================================================================== --%>
+<%-- ================================================================== --%>
+                
+                <form:form action="/place-order" method="post" modelAttribute="cart">
+                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                <div class="mt-5 row g-4 justify-content-start">
+                <div class="col-12 col-md-6">
+                <div class="p-4 ">
+
+                <h5>Thong tin Ngươi Nhạn</h5>
+                <div class="row">
+                    <div class="col-12 form-group mb-3">
+                        <label>Tên người nhận</label>
+                        <input class="form-control" name="receiverName" required />
+                    </div>
+                    <div class="col-12 form-group mb-3">
+                        <label>Địa chỉ người nhận</label>
+                        <input class="form-control" name="receiverAddress" required />
+                    </div>
+                    <div class="col-12 form-group mb-3">
+                        <label>Số điện thoại</label>
+                        <input class="form-control" name="receiverPhone" required />
+                    </div>
+                    <div class="mt-4">
+                        <i class="fas fa-arrow-left"></i>
+                        <a href="/cart">Quay lại giỏ hàng</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+
+
 
                 <div class="mt-5 row g-4 justify-content-start">
                     <div class="col-12 col-md-8"></div>
@@ -220,65 +231,8 @@
                             </p>
                         </div>
 
-                        <%-- Nói chung ý tưởng là : Do javascript xử lí ở fe thoi (ta xử lí nút tăng giảm số lượng và giá tiền tăng giảm theo (giá * quantity)(cái này js xử lí),giờ ta muốn lưu những giá trị đó 
-                        (về name.. thì có thể lấy bình thường, nhưng về quantity... thì chỉ đang hiển thị ở fe ) vào database (phía be)
-                        thì Ta sẽ tạo ra 1 cái form nữa để hiển thị lại lần nữa rồi lấy lại đoạn dữ liệu đó --%>
 
-                        <%-- Tăng/giảm số lượng (quantity)
-                        Tính toán giá tiền (price * quantity) ngay lập tức
-                        Cập nhật các con số trên giao diện --%>
-
-                        <%-- Giả sử giỏ hàng có 2 sản phẩm:
-
-
-                        1. iPhone (quantity = 2)
-                        2. Macbook (quantity = 1)
-                        HTML sinh ra sẽ là:
-
-                        html
-                        <input type="hidden" name="cartDetails[0].id" value="1">
-                        <input type="hidden" name="cartDetails[0].quantity" value="2" id="hiddenQty_0">
-
-                        <input type="hidden" name="cartDetails[1].id" value="2">
-                        <input type="hidden" name="cartDetails[1].quantity" value="1" id="hiddenQty_1">
-
-                        Khi người dùng tăng số lượng Macbook lên 2:
-                        javascript
-                        $("#hiddenQty_1").val(2);  // Cập nhật form ẩn
-
-                        Kết quả POST đến server:
-                        cartDetails[0].id=1&cartDetails[0].quantity=2
-                        &cartDetails[1].id=2&cartDetails[1].quantity=2  --%>
-
-                        <%-- path - Là "ĐỊA CHỈ NHÀ" cho Spring
-
-                        <form:input path="cartDetails[0].quantity"/>
-                        Giống như địa chỉ gửi thư: "Số 1, đường CartDetails, phường Quantity"
-
-                        Mục đích:
-                        Khi bạn submit form, Spring sẽ biết đặt giá trị vào đâu trong đối tượng Java
-                        Ví dụ: cart.getCartDetails().get(0).setQuantity(value_from_form)
-
-                        Spring dùng path để:
-                        Tìm đúng thuộc tính trong domain
-                        Gán giá trị từ form vào đúng vị trí --%>
-
-                        <%--
-                        2. id - Là "SỐ ĐIỆN THOẠI" cho JavaScript
-
-                        <form:input id="cartDetails0__quantity"/>
-                        Giống như số điện thoại để gọi cho ai đó
-
-                        Mục đích:
-                        Để JavaScript có thể tìm và thao tác với đúng ô input
-
-                        javascript
-                        document.getElementById("cartDetails0__quantity").value = 5; --%>
-
-                        <%--Có index Để Xác Định Chính Xác Vị Trí Từng Sản Phẩm (Để JavaScript Có Thể Thao Tác Chính Xác)--%>
-
-
-                        <form:form action="/confirm-checkout" method="post" modelAttribute="cart">
+                        <%-- ========================================================== --%>
                             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
                             <div style="display: block;">
                                 <c:forEach var="cartDetail" items="${cart.cartDetails}" varStatus="status">
@@ -298,10 +252,6 @@
                                                 id="cartDetails${status.index}__quantity" /></div>
                                     </div>
 
-                                    <%--
-                            id	id="cartDetails0__quantity"	Dành cho JavaScript (tìm và sửa giá trị)
-                            path	path="cartDetails[0].quantity"	Dành cho Spring MVC (bind dữ liệu từ form → Java object)
-                            --%>
                                 </c:forEach>
                             </div>
 
@@ -315,10 +265,8 @@
             </div>
         </div>
     </div>
-
-
-<%--  ====================================================================--%>
-    <jsp:include page="../layout/footer.jsp" />
+<%-- ================================================================== --%>
+                <jsp:include page="../layout/footer.jsp" />
 
 
     <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"><i

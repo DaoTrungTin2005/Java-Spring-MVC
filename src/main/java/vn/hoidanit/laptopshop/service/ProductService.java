@@ -188,4 +188,31 @@ public class ProductService {
             }
         }
     }
+    // ==========================================================================
+    // FE (JSP/JavaScript): Đã xử lý tăng/giảm số lượng (quantity) và cập nhật
+    // real-time trên giao diện
+    // Form ẩn: Chứa các giá trị quantity mới sau khi người dùng thao tác
+    // Method này: Là bước cuối cùng để đồng bộ dữ liệu từ FE xuống database trước
+    // khi checkout
+
+    public void handleUpdateCartBeforeCheckout(List<CartDetail> cartDetails) {
+        for (CartDetail cartDetail : cartDetails) {
+            // 1. Tìm CartDetail trong database theo ID từ dữ liệu FE gửi lên
+            // Truy vấn database để lấy bản ghi CartDetail hiện tại bằng ID
+            Optional<CartDetail> cdOptional = this.cartDetailRepository.findById(cartDetail.getId());
+
+            // Kiểm tra nếu bản ghi tồn tại trong database
+            // Lấy ra đối tượng CartDetail thực sự từ Optional
+            if (cdOptional.isPresent()) {
+                CartDetail currentCartDetail = cdOptional.get();
+
+                // Cập nhật số lượng mới từ dữ liệu FE vào bản ghi database
+                currentCartDetail.setQuantity(cartDetail.getQuantity());
+
+                // Lưu thay đổi vào database
+                // Đảm bảo số lượng mới sẽ được dùng cho quy trình thanh toán tiếp theo
+                this.cartDetailRepository.save(currentCartDetail);
+            }
+        }
+    }
 }

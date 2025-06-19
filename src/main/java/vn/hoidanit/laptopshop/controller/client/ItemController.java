@@ -3,11 +3,12 @@ package vn.hoidanit.laptopshop.controller.client;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.Spring;
+
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import vn.hoidanit.laptopshop.domain.Cart;
@@ -17,6 +18,7 @@ import vn.hoidanit.laptopshop.domain.User;
 import vn.hoidanit.laptopshop.service.ProductService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -155,6 +157,8 @@ public class ItemController {
         // toán.
         model.addAttribute("totalPrice", totalPrice);
 
+        model.addAttribute("cart", cart);
+
         return "client/cart/show";
     }
     // ================================================================
@@ -176,4 +180,77 @@ public class ItemController {
         return "redirect:/cart";
     }
 
+    @GetMapping("/checkout")
+    public String getCheckOutPage(Model model, HttpServletRequest request) {
+        User currentUser = new User();// null
+        HttpSession session = request.getSession(false);
+        long id = (long) session.getAttribute("id");
+        currentUser.setId(id);
+
+        Cart cart = this.productService.fetchByUser(currentUser);
+
+        List<CartDetail> cartDetails = cart == null ? new ArrayList<CartDetail>() : cart.getCartDetails();
+
+        double totalPrice = 0;
+        for (CartDetail cd : cartDetails) {
+            totalPrice += cd.getPrice() * cd.getQuantity();
+        }
+
+        model.addAttribute("cartDetails", cartDetails);
+        model.addAttribute("totalPrice", totalPrice);
+
+        return "client/cart/checkout";
+    }
+
+    @PostMapping("/confirm-checkout")
+
+    // @ModelAttribute("cart"): Spring tự động bind data từ form ẩn vào object Cart
+    // (chứa list CartDetail đã được JS cập nhật)
+    public String getCheckOutPage(@ModelAttribute("cart") Cart cart) {
+
+        // Giải thích 1 chút về cái path
+        // Form JSP của bạn có:
+
+        // <form:input
+        // path="cartDetails[${status.index}].quantity"
+        // id="cartDetails${status.index}__quantity" />
+
+        // → Khi submit form, dữ liệu gửi lên server sẽ có dạng:
+
+        // cartDetails[0].id=1&cartDetails[0].quantity=2
+        // cartDetails[1].id=2&cartDetails[1].quantity=1
+
+        // Controller nhận dữ liệu nhờ @ModelAttribute:
+        // public String getCheckOutPage(@ModelAttribute("cart") Cart cart) {
+        // // Spring tự động làm những việc sau:
+        // // 1. Tạo đối tượng Cart
+        // // 2. Bind dữ liệu từ form vào Cart theo CẤU TRÚC PATH
+        // // cartDetails[0].quantity → cart.getCartDetails().get(0).setQuantity()
+        // // cartDetails[1].quantity → cart.getCartDetails().get(1).setQuantity()
+        // }
+
+        // Phòng trường hợp giỏ hàng rỗng: Nếu cart null sẽ tạo list rỗng thay vì bị NPE
+        // cart.getCartDetails(): Lấy danh sách sản phẩm đã được cập nhật số lượng từ FE
+        // (chỉ mới fe thôi)
+        List<CartDetail> cartDetails = cart == null ? new ArrayList<CartDetail>() : cart.getCartDetails();
+
+        // Gọi service để:
+        // Cập nhật quantity mới vào database
+        // Thực hiện các kiểm tra nghiệp vụ (nếu có)
+        this.productService.handleUpdateCartBeforeCheckout(cartDetails);
+
+        // Sau khi xử lý xong, chuyển hướng sang trang thanh toán thực sự
+        return "redirect:/checkout";
+    }
+
+    @PostMapping("/place-order")
+    public String handlePlaceOrder(
+            HttpServletRequest request,
+            @RequestParam("receiverName") String receiverName,
+            @RequestParam("receiverAddress") String receiverAddress,
+            @RequestParam("receiverPhone") String receiverPhone) {
+        HttpSession session = request.getSession(false);
+
+        return "redirect:/";
+    }
 }

@@ -236,25 +236,36 @@ public class ProductService {
 
     public void handlePlaceOrder(User user, HttpSession session, String receiverName, String receiverAddress,
             String receiverPhone) {
-        // create order
-        // Lưu đơn hàng mới vào bảng Order, gắn user và thông tin người nhận
-        Order order = new Order();
-        order.setUser(user);
-        order.setReceiverName(receiverName);
-        order.setReceiverAddress(receiverAddress);
-        order.setReceiverPhone(receiverPhone);
-        order = this.orderRepository.save(order);
 
-        // create orderDetail
-        // step 1: get cart by user
-        // ➡️ Tìm giỏ hàng của user theo userId
+        // ➡️ Lấy Cart tương ứng với user (thường là user.id đã được set sẵn từ
+        // session).
         Cart cart = this.cartRepository.findByUser(user);
+
+        // ✅ 2. Kiểm tra giỏ hàng có sản phẩm không
         if (cart != null) {
             List<CartDetail> cartDetail = cart.getCartDetails();
 
-            // 🔹 c. Duyệt các món hàng trong giỏ → tạo từng OrderDetail
-            // 🧠 Mỗi sản phẩm trong giỏ hàng sẽ trở thành 1 dòng trong bảng OrderDetails.
             if (cartDetail != null) {
+
+                // ✅ 3. Tạo đơn hàng Order sau khi đã xác thực dữ liệu
+                Order order = new Order();
+                order.setUser(user);
+                order.setReceiverName(receiverName);
+                order.setReceiverAddress(receiverAddress);
+                order.setReceiverPhone(receiverPhone);
+                order.setStatus("PENDING");
+
+                // ➡️ Tính tổng giá trị của toàn bộ sản phẩm trong giỏ → gán vào Order.totalPrice.
+                double sum = 0;
+                for (CartDetail cd : cartDetail) {
+                    sum += cd.getPrice();
+                }
+                order.setTotalPrice(sum);
+
+                // ➡️ Sau khi có đầy đủ thông tin, lưu Order → trả về đối tượng order đã có ID.
+                order = this.orderRepository.save(order);
+
+                // ➡️ Mỗi sản phẩm trong giỏ sẽ tạo ra một dòng chi tiết trong OrderDetails.
                 for (CartDetail cd : cartDetail) {
                     OrderDetails orderDetail = new OrderDetails();
                     orderDetail.setOrder(order);
@@ -263,6 +274,7 @@ public class ProductService {
                     orderDetail.setQuantity(cd.getQuantity());
                     this.orderDetailRepository.save(orderDetail);
                 }
+
                 // step 2 delete cart_detail and cart
                 // 👉 Sau khi tạo xong order, ta xóa giỏ hàng và các chi tiết của nó
                 for (CartDetail cd : cartDetail) {

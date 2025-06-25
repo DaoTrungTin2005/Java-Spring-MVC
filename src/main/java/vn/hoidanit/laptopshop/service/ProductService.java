@@ -8,10 +8,14 @@ import org.springframework.stereotype.Service;
 import jakarta.servlet.http.HttpSession;
 import vn.hoidanit.laptopshop.domain.Cart;
 import vn.hoidanit.laptopshop.domain.CartDetail;
+import vn.hoidanit.laptopshop.domain.Order;
+import vn.hoidanit.laptopshop.domain.OrderDetails;
 import vn.hoidanit.laptopshop.domain.Product;
 import vn.hoidanit.laptopshop.domain.User;
 import vn.hoidanit.laptopshop.repository.CartDetailRepository;
 import vn.hoidanit.laptopshop.repository.CartRepository;
+import vn.hoidanit.laptopshop.repository.OrderDetailRepository;
+import vn.hoidanit.laptopshop.repository.OrderRepository;
 import vn.hoidanit.laptopshop.repository.ProductRepository;
 
 @Service
@@ -20,13 +24,18 @@ public class ProductService {
     private final CartRepository cartRepository;
     private final CartDetailRepository cartDetailRepository;
     private final UserService userService;
+    private final OrderRepository orderRepository;
+    private final OrderDetailRepository orderDetailRepository;
 
     public ProductService(ProductRepository productRepository, CartRepository cartRepository,
-            CartDetailRepository cartDetailRepository, UserService userService) {
+            CartDetailRepository cartDetailRepository, UserService userService, OrderRepository orderRepository,
+            OrderDetailRepository orderDetailRepository) {
         this.productRepository = productRepository;
         this.cartRepository = cartRepository;
         this.cartDetailRepository = cartDetailRepository;
         this.userService = userService;
+        this.orderRepository = orderRepository;
+        this.orderDetailRepository = orderDetailRepository;
     }
 
     public Product createProduct(Product pr) {
@@ -212,6 +221,60 @@ public class ProductService {
                 // Lưu thay đổi vào database
                 // Đảm bảo số lượng mới sẽ được dùng cho quy trình thanh toán tiếp theo
                 this.cartDetailRepository.save(currentCartDetail);
+            }
+        }
+    }
+
+    // ========================================================================
+
+    // 🎯 Mục tiêu của đoạn code:
+    // Khi người dùng nhấn nút “Đặt hàng”, hệ thống sẽ:
+    // Tạo đơn hàng mới (Order)
+    // Lưu chi tiết các sản phẩm trong giỏ vào bảng OrderDetails
+    // Xóa giỏ hàng cũ (Cart và CartDetail)
+    // Chuyển hướng sang trang “Cảm ơn”
+
+    public void handlePlaceOrder(User user, HttpSession session, String receiverName, String receiverAddress,
+            String receiverPhone) {
+        // create order
+        // Lưu đơn hàng mới vào bảng Order, gắn user và thông tin người nhận
+        Order order = new Order();
+        order.setUser(user);
+        order.setReceiverName(receiverName);
+        order.setReceiverAddress(receiverAddress);
+        order.setReceiverPhone(receiverPhone);
+        order = this.orderRepository.save(order);
+
+        // create orderDetail
+        // step 1: get cart by user
+        // ➡️ Tìm giỏ hàng của user theo userId
+        Cart cart = this.cartRepository.findByUser(user);
+        if (cart != null) {
+            List<CartDetail> cartDetail = cart.getCartDetails();
+
+            // 🔹 c. Duyệt các món hàng trong giỏ → tạo từng OrderDetail
+            // 🧠 Mỗi sản phẩm trong giỏ hàng sẽ trở thành 1 dòng trong bảng OrderDetails.
+            if (cartDetail != null) {
+                for (CartDetail cd : cartDetail) {
+                    OrderDetails orderDetail = new OrderDetails();
+                    orderDetail.setOrder(order);
+                    orderDetail.setProduct(cd.getProduct());
+                    orderDetail.setPrice(cd.getPrice());
+                    orderDetail.setQuantity(cd.getQuantity());
+                    this.orderDetailRepository.save(orderDetail);
+                }
+                // step 2 delete cart_detail and cart
+                // 👉 Sau khi tạo xong order, ta xóa giỏ hàng và các chi tiết của nó
+                for (CartDetail cd : cartDetail) {
+                    this.cartDetailRepository.deleteById(cd.getId());
+
+                }
+                this.cartRepository.deleteById(cart.getId());
+
+                // step 3
+                // Đặt lại tổng tiền (sum) trong session về 0
+                session.setAttribute("sum", 0);
+
             }
         }
     }

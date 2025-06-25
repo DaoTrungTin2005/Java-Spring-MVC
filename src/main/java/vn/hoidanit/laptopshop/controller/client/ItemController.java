@@ -3,8 +3,6 @@ package vn.hoidanit.laptopshop.controller.client;
 import java.util.ArrayList;
 import java.util.List;
 
-
-
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -242,15 +240,41 @@ public class ItemController {
         // Sau khi xử lý xong, chuyển hướng sang trang thanh toán thực sự
         return "redirect:/checkout";
     }
+    // =================================================================
 
+    // 🎯 Mục tiêu của đoạn code:
+    // Khi người dùng nhấn nút “Đặt hàng”, hệ thống sẽ:
+    // Tạo đơn hàng mới (Order)
+    // Lưu chi tiết các sản phẩm trong giỏ vào bảng OrderDetails
+    // Xóa giỏ hàng cũ (Cart và CartDetail)
+    // Chuyển hướng sang trang “Cảm ơn”
+
+    // 🧠 Controller này nhận dữ liệu từ form đặt hàng (receiver name, address,
+    // phone).
+    // Sử dụng @RequestParam để lấy dữ liệu từ form
+    // Sử dụng HttpServletRequest để truy cập session
     @PostMapping("/place-order")
     public String handlePlaceOrder(
             HttpServletRequest request,
             @RequestParam("receiverName") String receiverName,
             @RequestParam("receiverAddress") String receiverAddress,
             @RequestParam("receiverPhone") String receiverPhone) {
-        HttpSession session = request.getSession(false);
 
-        return "redirect:/";
+        // Lấy user từ session
+        User currentUser = new User();// null
+        HttpSession session = request.getSession(false);
+        long id = (long) session.getAttribute("id");
+        currentUser.setId(id);
+
+        //➡️ Gọi xuống service để xử lý logic đặt hàng
+        this.productService.handlePlaceOrder(currentUser, session, receiverName, receiverAddress, receiverPhone);
+
+        return "redirect:/thankyou";
     }
+
+    @GetMapping("/thankyou")
+    public String getThankYouPage() {
+        return "client/cart/thankyou";
+    }
+
 }

@@ -20,6 +20,14 @@ public class Order {
     private long id;
     private double totalPrice;
 
+    public List<OrderDetails> getOrderDetails() {
+        return orderDetails;
+    }
+
+    public void setOrderDetails(List<OrderDetails> orderDetails) {
+        this.orderDetails = orderDetails;
+    }
+
     private String receiverName;
     private String receiverAddress;
     private String receiverPhone;
@@ -70,7 +78,7 @@ public class Order {
     }
 
     @OneToMany(mappedBy = "order")
-    List<OrderDetails> orderDetails;
+    private List<OrderDetails> orderDetails;
 
     public long getId() {
         return id;
